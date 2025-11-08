@@ -9,18 +9,10 @@ public class Article {
     private boolean isFeatured; // Cờ để xác định đây là tin nổi bật (thẻ to) hay tin thường
 
     // Constructor cho tin nổi bật (có description)
-    public Article(String title, String description, String imageUrl, boolean isFeatured) {
-        this.title = title;
-        this.description = description;
-        this.imageUrl = imageUrl;
-        this.date = "03/11/2025"; // Gán ngày tạm thời
-        this.isFeatured = isFeatured;
-    }
-
     // Constructor cho tin thường (chỉ có date)
     public Article(String title, String date, String imageUrl, boolean isFeatured) {
         this.title = title;
-        this.description = ""; // Gán rỗng
+        this.description =(isFeatured )? description:  ""; // Gán rỗng
         this.date = date;
         this.imageUrl = imageUrl;
         this.isFeatured = isFeatured;
