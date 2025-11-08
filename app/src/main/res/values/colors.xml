@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Màu chủ đạo -->
+    <color name="primary_blue">#005DFF</color> <!-- Ước tính màu xanh dương chính -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+    <!-- Màu văn bản -->
+    <color name="text_primary">#212121</color> <!-- Màu đen cho tiêu đề -->
+    <color name="text_secondary">#757575</color> <!-- Màu xám cho mô tả, label -->
+    <color name="text_hint">#BDBDBD</color> <!-- Màu xám cho chữ "Nhập tại đây" -->
+
+    <!-- Màu trạng thái -->
+    <color name="error_red">#D32F2F</color> <!-- Màu đỏ cho chữ "Thất bại" -->
+
+    <!-- Màu khác -->
+    <color name="input_field_border">#E0E0E0</color> <!-- Màu viền ô nhập liệu -->
+    <color name="dialog_overlay">#80000000</color> <!-- Màu nền xám mờ phía sau dialog -->
+
+    <color name="chip_background">#F6F6F6</color> <!-- Màu nền xám nhạt cho các tab chuyên mục -->
+    <color name="section_header_line">@color/primary_blue</color> <!-- Màu của đường kẻ dọc ở tiêu đề mục -->
+    <color name="footer_background">#FAFAFA</color> <!-- Màu nền của phần footer -->
+    <color name="bottom_nav_icon_tint">#757575</color> <!-- Màu của icon trên Bottom Nav khi không được chọn -->
+</resources>

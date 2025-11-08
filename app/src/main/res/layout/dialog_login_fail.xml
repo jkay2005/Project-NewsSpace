@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sử dụng CardView làm gốc để có hiệu ứng đổ bóng và bo góc đẹp -->
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="@dimen/corner_radius_dialog"
+    app:cardElevation="8dp"
+    android:layout_margin="32dp">
+
+    <!-- LinearLayout để sắp xếp các phần tử theo chiều dọc -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_large">
+
+        <!-- Tiêu đề "Thất bại" -->
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thất bại"
+            android:textColor="@color/error_red"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Nội dung mô tả lỗi -->
+
+        <!-- Nút OK -->
+
+        <TextView
+            android:id="@+id/messageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.2"
+            android:text="Tên tài khoản hoặc mật khẩu không đúng.\nVui lòng đăng nhập lại."
+            android:textColor="@color/text_secondary" />
+
+        <Button
+            android:id="@+id/okButton"
+            style="@style/Widget.App.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:text="OK" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

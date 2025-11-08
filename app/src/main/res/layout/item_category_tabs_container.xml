@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sử dụng HorizontalScrollView để cho phép cuộn ngang -->
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="none"
+    android:clipToPadding="false"
+    android:paddingHorizontal="@dimen/spacing_medium">
+
+    <!-- ChipGroup là component tuyệt vời để hiển thị các lựa chọn -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/categoryChipGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:singleLine="true"
+        app:singleSelection="true">
+
+        <!-- Bạn sẽ thêm các Chip vào đây bằng code Java -->
+        <!-- Dưới đây chỉ là ví dụ để xem trước -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipHome"
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:chipIcon="@drawable/ic_home"
+            app:chipIconTint="@color/primary_blue"
+            android:contentDescription="reload"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mới nhất" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thời sự" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chính trị" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thế giới" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kinh tế" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đời sống" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Văn hóa" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Du lịch" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giải trí" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giới trẻ" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giáo dục" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thể thao" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sức khỏe" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Công nghệ" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thời trang" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xe" />
+
+        <com.google.android.material.chip.Chip
+            style="@style/Widget.App.CategoryChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tiêu dùng" />
+        <!-- ... và các chip khác -->
+
+    </com.google.android.material.chip.ChipGroup>
+</HorizontalScrollView>

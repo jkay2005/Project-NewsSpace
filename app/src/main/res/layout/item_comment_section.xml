@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_medium"
+    android:background="#F5F5F5"> <!-- Một màu nền nhẹ để phân biệt -->
+
+    <!-- ============================================= -->
+    <!-- == PHẦN TIÊU ĐỀ "BÌNH LUẬN" ĐÃ ĐƯỢC SỬA LẠI == -->
+    <!-- ============================================= -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <View
+            android:layout_width="4dp"
+            android:layout_height="18dp"
+            android:background="@color/primary_blue" />
+
+        <TextView
+            style="@style/Widget.App.SectionHeader.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Bình luận" /> <!-- Sửa trực tiếp text ở đây -->
+    </LinearLayout>
+
+    <!-- Ô nhập bình luận -->
+    <EditText
+        android:id="@+id/commentEditText"
+        style="@style/Widget.App.EditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:gravity="top"
+        android:hint="Nhập bình luận"
+        android:lines="3" />
+
+    <!-- Nút Gửi -->
+    <Button
+        android:id="@+id/sendCommentButton"
+        style="@style/Widget.App.Button.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="@dimen/spacing_small"
+        android:text="Gửi" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="@dimen/spacing_large">
+
+        <View
+            android:layout_width="4dp"
+            android:layout_height="18dp"
+            android:background="@color/primary_blue" />
+
+        <TextView
+            style="@style/Widget.App.SectionHeader.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Danh sách Bình luận" /> <!-- Sửa trực tiếp text ở đây -->
+    </LinearLayout>
+
+    <!-- RecyclerView để hiển thị danh sách các bình luận -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/commentsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_small"
+        tools:itemCount="2"
+        tools:listitem="@layout/item_comment" />
+
+</LinearLayout>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/nav_home"> <!-- Đặt điểm khởi đầu là nav_home -->
+
+    <!-- Điểm đến: HomeFragment -->
+    <fragment
+
+        android:id="@+id/nav_home"
+        android:name="course.examples.newsspace.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_categoryNewsFragment"
+            app:destination="@id/categoryNewsFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_articleDetailFragment"
+            app:destination="@id/articleDetailFragment" />
+    </fragment>
+    <!-- ID này PHẢI TRÙNG với ID trong menu -->
+
+    <!-- Điểm đến: ExploreFragment -->
+    <fragment
+        android:id="@+id/nav_explore"
+        android:name="course.examples.newsspace.ExploreFragment"
+        android:label="fragment_explore"
+        tools:layout="@layout/fragment_explore" />
+    <!-- ID này PHẢI TRÙNG với ID trong menu -->
+
+    <!-- Điểm đến: BookmarkFragment -->
+    <fragment
+        android:id="@+id/nav_bookmark"
+        android:name="course.examples.newsspace.BookmarkFragment"
+        android:label="fragment_bookmark"
+        tools:layout="@layout/fragment_bookmark" />
+    <!-- ID này PHẢI TRÙNG với ID trong menu -->
+
+    <!-- Điểm đến: SettingsFragment -->
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="course.examples.newsspace.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/categoryNewsFragment"
+        android:name="course.examples.newsspace.CategoryNewsFragment"
+        android:label="fragment_category_news"
+        tools:layout="@layout/fragment_category_news" >
+        <argument
+            android:name="categoryName"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_categoryNewsFragment_to_articleDetailFragment"
+            app:destination="@id/articleDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/articleDetailFragment"
+        android:name="course.examples.newsspace.ArticleDetailFragment"
+        android:label="ArticleDetailFragment" >
+        <argument
+            android:name="articleId"
+            app:argType="string" />
+    </fragment>
+    <!-- ID này PHẢI TRÙNG với ID trong menu -->
+</navigation>

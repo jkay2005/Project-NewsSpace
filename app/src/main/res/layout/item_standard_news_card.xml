@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/spacing_medium">
+
+    <ImageView
+        android:id="@+id/newsImageView"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/newsTitleTextView"
+        style="@style/TextAppearance.App.NewsTitle.Small"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:maxLines="3"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toStartOf="@id/newsImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Bé trai trôi giữa dòng nước xiết sông Hàn, câu chuyện phía sau khiến ai cũng nghẹn lòng" />
+
+    <!-- Thêm ngày đăng và icon bookmark ở đây -->
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_size_date"
+        app:layout_constraintStart_toStartOf="@id/newsTitleTextView"
+        app:layout_constraintTop_toBottomOf="@id/newsTitleTextView"
+        tools:text="4/10/2025" />
+
+    <ImageView
+        android:id="@+id/bookmarkImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_bookmark_border"
+        app:layout_constraintBottom_toBottomOf="@id/dateTextView"
+        app:layout_constraintEnd_toEndOf="@id/newsTitleTextView"
+        app:layout_constraintTop_toTopOf="@id/dateTextView" />
+
+    <!-- Đường kẻ phân cách (cập nhật constraint) -->
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:background="#1F000000"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/newsImageView" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

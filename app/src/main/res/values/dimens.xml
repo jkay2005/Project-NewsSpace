@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bán kính bo góc -->
+    <dimen name="corner_radius_button">12dp</dimen>
+    <dimen name="corner_radius_input">12dp</dimen>
+    <dimen name="corner_radius_dialog">16dp</dimen>
+
+    <!-- Khoảng cách chung -->
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_xlarge">32dp</dimen>
+
+    <!-- Kích thước chữ -->
+    <dimen name="text_size_headline">24sp</dimen>
+    <dimen name="text_size_body">14sp</dimen>
+    <dimen name="text_size_label">12sp</dimen>
+
+    <!-- Card tin tức -->
+    <dimen name="featured_card_image_height">180dp</dimen>
+    <dimen name="standard_card_image_size">80dp</dimen>
+
+    <!-- Kích thước chữ -->
+    <dimen name="text_size_news_title_large">20sp</dimen>
+    <dimen name="text_size_news_title_small">16sp</dimen>
+    <dimen name="text_size_news_description">14sp</dimen>
+    <dimen name="text_size_date">12sp</dimen>
+    <dimen name="text_size_section_header">18sp</dimen>
+
+    <!-- Khác -->
+    <dimen name="section_header_line_width">4dp</dimen>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/paragraphTextView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingHorizontal="@dimen/spacing_medium"
+    android:paddingBottom="@dimen/spacing_medium"
+    android:textColor="?attr/colorOnSurface"
+    android:textSize="16sp"
+    android:lineSpacingMultiplier="1.5"
+    tools:text="Đại biểu Quốc hội đề cập tới hiện tượng đánh giá ảo (còn gọi là review giả) khi bán hàng online, cho rằng cần quy định cụ thể về các hành vi cạnh tranh không lành mạnh." />
