@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/spacing_medium">
+
+    <!-- Header của dialog -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_medium">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cỡ chữ"
+            android:layout_centerInParent="true"
+            style="@style/Widget.App.SectionHeader.TextView"/>
+
+        <ImageView
+            android:id="@+id/closeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_close"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <!-- Các lựa chọn cỡ chữ -->
+    <!-- Lựa chọn "Nhỏ" -->
+    <TextView
+        android:id="@+id/fontSizeSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nhỏ"
+        android:padding="@dimen/spacing_medium"
+        android:drawableEnd="@android:color/transparent"/> <!-- Mặc định không có icon -->
+
+    <!-- Lựa chọn "Vừa" -->
+    <TextView
+        android:id="@+id/fontSizeMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Vừa"
+        android:padding="@dimen/spacing_medium"
+        android:textStyle="bold"
+        android:textColor="@color/primary_blue"
+        app:drawableEndCompat="@drawable/ic_check"
+        app:drawableTint="@color/primary_blue"/> <!-- Trạng thái được chọn mặc định -->
+
+    <!-- Lựa chọn "Lớn" -->
+    <TextView
+        android:id="@+id/fontSizeLarge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lớn"
+        android:padding="@dimen/spacing_medium"
+        android:drawableEnd="@android:color/transparent"/>
+
+</LinearLayout>
