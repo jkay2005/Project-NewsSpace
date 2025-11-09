@@ -21,4 +21,5 @@
     <color name="section_header_line">@color/primary_blue</color> <!-- Màu của đường kẻ dọc ở tiêu đề mục -->
     <color name="footer_background">#FAFAFA</color> <!-- Màu nền của phần footer -->
     <color name="bottom_nav_icon_tint">#757575</color> <!-- Màu của icon trên Bottom Nav khi không được chọn -->
+    <color name="grey_200">#EEEEEE</color>
 </resources>

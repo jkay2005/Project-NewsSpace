@@ -34,7 +34,17 @@ android {
 }
 
 dependencies {
+    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 
+    implementation 'org.jsoup:jsoup:1.15.3'
+
+    // Retrofit - Thư viện gọi API mạnh mẽ
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+// Gson Converter - Tự động chuyển đổi JSON sang đối tượng Java
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // OkHttp Logging Interceptor (tùy chọn nhưng rất hữu ích) - để xem log request/response
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
     implementation 'com.google.android.material:material:1.7.0'
     implementation libs.navigation.fragment
     implementation libs.navigation.ui

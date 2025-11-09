@@ -24,4 +24,5 @@ public class Article {
     public String getImageUrl() { return imageUrl; }
     public String getDate() { return date; }
     public boolean isFeatured() { return isFeatured; }
+    // Các getter khác...
 }

@@ -2,13 +2,15 @@ package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
-// Import các lớp ViewBinding được tự động tạo ra
 import course.examples.newsspace.databinding.ItemFeaturedNewsCardBinding;
 import course.examples.newsspace.databinding.ItemStandardNewsCardBinding;
+import course.examples.newsspace.model.Article;
 
 /**
  * Adapter này chịu trách nhiệm hiển thị danh sách các bài báo (Article).
