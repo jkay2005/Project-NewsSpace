@@ -35,6 +35,11 @@ public class ExploreFragment extends Fragment {
         loadNewsData();
         setupTopicChips();
 
+        // THAY ĐỔI 1: Gán sự kiện click cho nút "Tùy chỉnh" mới trong header
+        // Truy cập thông qua binding của layout cha -> binding của layout được include -> id của nút
+        binding.headerLayout.customizeButtonInHeader.setOnClickListener(v -> showCustomizeView());
+
+        // Nút "Xác nhận" không thay đổi
         // Gán sự kiện click cho các nút
        // binding.customizeButton.setOnClickListener(v -> showCustomizeView());
         binding.confirmButton.setOnClickListener(v -> showNewsView());
@@ -64,12 +69,18 @@ public class ExploreFragment extends Fragment {
         binding.newsRecyclerView.setVisibility(View.GONE);
      //   binding.customizeButton.setVisibility(View.GONE);
         binding.customizeLayout.setVisibility(View.VISIBLE);
+        // THAY ĐỔI 2: Xóa dòng code liên quan đến nút "Tùy chỉnh" cũ
+        // binding.customizeButton.setVisibility(View.GONE);
     }
 
+    // Hiển thị màn hình tin tức, ẩn màn hình tùy chỉnh
     // Hiển thị màn hình tin tức, ẩn màn hình tùy chỉnh
     private void showNewsView() {
         binding.customizeLayout.setVisibility(View.GONE);
         binding.newsRecyclerView.setVisibility(View.VISIBLE);
+        // THAY ĐỔI 3: Xóa dòng code liên quan đến nút "Tùy chỉnh" cũ
+        // binding.customizeButton.setVisibility(View.VISIBLE);
+
      //   binding.customizeButton.setVisibility(View.VISIBLE);
         // TODO: Dựa vào các chip đã chọn để tải lại danh sách tin tức
         // loadNewsData();
