@@ -7,31 +7,36 @@ import android.os.Looper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * SplashActivity là màn hình khởi đầu của ứng dụng.
+ * Nhiệm vụ của nó chỉ là hiển thị logo/thương hiệu trong một thời gian ngắn,
+ * sau đó chuyển người dùng đến luồng xác thực (đăng nhập/đăng ký).
+ */
 public class SplashActivity extends AppCompatActivity {
 
-    private static final int SPLASH_DELAY = 2000; // 2 giây
+    // Thời gian hiển thị màn hình Splash (tính bằng mili giây)
+    private static final int SPLASH_DISPLAY_DURATION = 2000; // 2 giây
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Giả sử bạn có một class SessionManager để kiểm tra trạng thái đăng nhập
-            // SessionManager sessionManager = new SessionManager(this);
-            boolean isLoggedIn = false; // Thay bằng logic kiểm tra thật: sessionManager.isLoggedIn();
+        // Sử dụng Handler để trì hoãn việc chuyển màn hình
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Tạo một Intent để mở AuthenticationActivity
+                // (Activity này là khung chứa cho màn hình Đăng nhập)
+                Intent mainIntent = new Intent(SplashActivity.this, AuthenticationActivity.class);
 
-            if (isLoggedIn) {
-                // Nếu đã đăng nhập, chuyển đến MainActivity
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-            } else {
-                // Nếu chưa, chuyển đến AuthenticationActivity
-                startActivity(new Intent(SplashActivity.this, AuthenticationActivity.class));
+                // Khởi động Activity mới
+                SplashActivity.this.startActivity(mainIntent);
+
+                // Gọi finish() để đóng SplashActivity lại.
+                // Điều này ngăn người dùng quay lại màn hình Splash khi nhấn nút Back.
+                SplashActivity.this.finish();
             }
-
-            // Kết thúc SplashActivity để người dùng không thể quay lại màn hình này
-            finish();
-
-        }, SPLASH_DELAY);
+        }, SPLASH_DISPLAY_DURATION);
     }
 }
