@@ -56,7 +56,7 @@
             android:id="@+id/authorAvatarImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_avatar_placeholder" />
+            android:src="@drawable/ic_avatar_placeholder1" />
 
         <!-- Tên tác giả -->
         <TextView
