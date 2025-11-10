@@ -137,8 +137,9 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             chip.setText(categoryName);
             // Gán sự kiện click cho từng Chip
             chip.setOnClickListener(v -> {
-                // Điều hướng sang CategoryNewsFragment và truyền tên chuyên mục
-                HomeFragmentDirections.ActionHomeFragmentToCategoryNewsFragment action = HomeFragmentDirections.actionHomeFragmentToCategoryNewsFragment(categoryName);
+                // SỬA LỖI: Sử dụng ID action mới
+                HomeFragmentDirections.ActionHomeToCategory action =
+                        HomeFragmentDirections.actionHomeToCategory(categoryName);
                 Navigation.findNavController(v).navigate(action);
             });
             holder.binding.categoryChipGroup.addView(chip);

@@ -46,13 +46,10 @@ dependencies {
     // OkHttp Logging Interceptor (tùy chọn nhưng rất hữu ích) - để xem log request/response
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
     implementation 'com.google.android.material:material:1.7.0'
-    implementation libs.navigation.fragment
-    implementation libs.navigation.ui
     def nav_version = "2.5.3" // (Kiểm tra phiên bản mới nhất)
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
     implementation libs.appcompat
-    implementation libs.material
     implementation libs.activity
     implementation libs.constraintlayout
     testImplementation libs.junit

@@ -20,8 +20,8 @@ import course.examples.newsspace.model.Article;
 public class CategoryNewsFragment extends Fragment {
 
     private FragmentCategoryNewsBinding binding;
-    private ArticleListAdapter adapter; // Sẽ tạo Adapter này ở bước sau
-    private List<Article> articleList = new ArrayList<>();
+    private ArticleListAdapter adapter;
+    private final List<Article> articleList = new ArrayList<>();
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,12 +33,8 @@ public class CategoryNewsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Lấy tên chuyên mục được truyền từ HomeFragment (sẽ làm ở bước sau)
-        // String categoryName = CategoryNewsFragmentArgs.fromBundle(getArguments()).getCategoryName();
-        // binding.toolbar.setTitle(categoryName);
         binding.toolbar.setTitle("Mới nhất"); // Tạm thời gán cứng
 
-        // Xử lý sự kiện click nút Back trên Toolbar
         binding.toolbar.setNavigationOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
 
         setupRecyclerView();
@@ -52,16 +48,15 @@ public class CategoryNewsFragment extends Fragment {
     }
 
     private void loadNewsData() {
-        // *** GIẢ LẬP TẢI DỮ LIỆU TỪ API ***
         articleList.clear();
 
-        // Thêm tin nổi bật đầu tiên (dùng layout to)
-        articleList.add(new Article("Đại hồng thủy...", "Nước sông Thu Bồn...", "url_to_image_1", true));
-        articleList.add(new Article("Hơn 6.300 cán bộ...", "Từ đầu năm 2025...", "url_to_image_2", true));
+        // Thêm tin nổi bật đầu tiên - sử dụng factory method
+        articleList.add(Article.createFeaturedArticle("Đại hồng thủy...", "Nước sông Thu Bồn...", "url_to_image_1"));
+        articleList.add(Article.createFeaturedArticle("Hơn 6.300 cán bộ...", "Từ đầu năm 2025...", "url_to_image_2"));
 
-        // Thêm các tin thường (dùng layout nhỏ)
+        // Thêm các tin thường - sử dụng factory method
         for (int i = 0; i < 10; i++) {
-            articleList.add(new Article("Bé trai trôi giữa dòng nước...", "4/10/2025", "url_to_image_" + i, false));
+            articleList.add(Article.createStandardArticle("Bé trai trôi giữa dòng nước...", "4/10/2025", "url_to_image_" + i));
         }
 
         adapter.notifyDataSetChanged();

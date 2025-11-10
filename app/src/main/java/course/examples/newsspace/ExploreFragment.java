@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import course.examples.newsspace.model.Article;
 import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;

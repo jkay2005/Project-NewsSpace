@@ -12,8 +12,9 @@
         android:name="course.examples.newsspace.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
+        <!-- SỬA LỖI: Đổi ID thành tên đơn giản hơn để kích hoạt lại code generation -->
         <action
-            android:id="@+id/action_nav_home_to_categoryNewsFragment"
+            android:id="@+id/action_home_to_category"
             app:destination="@id/categoryNewsFragment" />
         <action
             android:id="@+id/action_nav_home_to_articleDetailFragment"

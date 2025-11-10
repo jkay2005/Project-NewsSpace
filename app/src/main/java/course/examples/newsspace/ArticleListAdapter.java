@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import course.examples.newsspace.databinding.ItemFeaturedNewsCardBinding;
@@ -45,8 +47,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             return VIEW_TYPE_FEATURED; // Nếu là tin nổi bật, trả về loại FEATURED
         } else {
             return VIEW_TYPE_STANDARD; // Nếu không, trả về loại STANDARD
-        }
-    }
+        }    }
 
     /**
      * 5. Tạo ra ViewHolder tương ứng với ViewType đã được quyết định ở trên.
@@ -79,12 +80,16 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             featuredHolder.binding.newsTitleTextView.setText(article.getTitle());
             featuredHolder.binding.newsDescriptionTextView.setText(article.getDescription());
             featuredHolder.binding.dateTextView.setText(article.getDate());
-            // TODO: Dùng thư viện Glide/Picasso để tải ảnh từ article.getImageUrl() vào featuredHolder.binding.newsImageView
+            Glide.with(holder.itemView.getContext())
+                    .load(article.getImageUrl())
+                    .into(featuredHolder.binding.newsImageView);
         } else { // holder.getItemViewType() == VIEW_TYPE_STANDARD
             StandardNewsViewHolder standardHolder = (StandardNewsViewHolder) holder;
             standardHolder.binding.newsTitleTextView.setText(article.getTitle());
             standardHolder.binding.dateTextView.setText(article.getDate());
-            // TODO: Dùng thư viện Glide/Picasso để tải ảnh từ article.getImageUrl() vào standardHolder.binding.newsImageView
+            Glide.with(holder.itemView.getContext())
+                    .load(article.getImageUrl())
+                    .into(standardHolder.binding.newsImageView);
         }
     }
 
