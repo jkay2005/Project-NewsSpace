@@ -15,10 +15,7 @@ import retrofit2.http.Query;
 import course.examples.newsspace.model.*; // Giả sử tất cả model nằm trong package này
 
 public interface ApiService {
-
-    // ======================================================
-    // Auth Endpoints - API Xác thực
-    // ======================================================
+    // API Xác thực
 
     /**
      * Đăng ký một người dùng mới.

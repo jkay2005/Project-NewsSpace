@@ -22,4 +22,6 @@
     <color name="footer_background">#FAFAFA</color> <!-- Màu nền của phần footer -->
     <color name="bottom_nav_icon_tint">#757575</color> <!-- Màu của icon trên Bottom Nav khi không được chọn -->
     <color name="grey_200">#EEEEEE</color>
+
+    <color name="grey_500">#9E9E9E</color>
 </resources>

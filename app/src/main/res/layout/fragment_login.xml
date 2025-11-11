@@ -43,19 +43,20 @@
         app:layout_constraintTop_toBottomOf="@id/titleTextView"
         app:layout_constraintStart_toStartOf="parent"/>
 
+    <!-- Ô nhập Mật khẩu -->
     <EditText
         android:id="@+id/emailEditText"
         style="@style/Widget.App.EditText"
-        android:layout_width="372dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="@dimen/spacing_small"
+        android:layout_width="350dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="12dp"
         android:hint="Nhập tại đây"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emailLabel" />
 
-    <!-- Ô nhập Mật khẩu -->
     <TextView
         android:id="@+id/passwordLabel"
         android:layout_width="wrap_content"
@@ -75,21 +76,22 @@
         app:layout_constraintTop_toBottomOf="@id/passwordEditText"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <EditText
-        android:id="@+id/passwordEditText"
-        style="@style/Widget.App.EditText"
-        android:layout_width="367dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="@dimen/spacing_small"
-        android:hint="Nhập tại đây"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/passwordLabel" />
-
     <!-- Nút Đăng nhập -->
 
     <!-- Link sang trang Đăng ký -->
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        style="@style/Widget.App.EditText"
+        android:layout_width="350dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:hint="Nhập tại đây"
+        android:inputType="textPassword"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordLabel" />
 
     <Button
         android:id="@+id/loginButton"

@@ -16,7 +16,7 @@
             android:id="@+id/collectionNameEditText"
             style="@style/Widget.App.EditText"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:hint="Nhập tên ở đây..."
             android:inputType="textCapSentences"/> <!-- Tự động viết hoa chữ cái đầu câu -->
 

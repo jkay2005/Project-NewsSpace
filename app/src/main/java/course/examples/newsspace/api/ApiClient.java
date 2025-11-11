@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiClient {
 
     // URL gốc của API. Thay đổi nếu cần.
-    private static final String BASE_URL = "http://your.api.base.url/"; // <-- THAY ĐỔI URL NÀY
+    private static final String BASE_URL = "https://newsspace-api-cnbkbjenf6hzd3ad.southeastasia-01.azurewebsites.net/"; // <-- THAY ĐỔI URL NÀY
 
     private static Retrofit retrofit = null;
 

@@ -67,4 +67,7 @@
         <item name="android:textStyle">bold</item>
         <item name="android:lineSpacingMultiplier">1.2</item>
     </style>
+
+
+
 </resources>
