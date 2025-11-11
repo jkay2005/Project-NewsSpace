@@ -48,7 +48,7 @@
         android:id="@+id/emailEditText"
         style="@style/Widget.App.EditText"
         android:layout_width="350dp"
-        android:layout_height="43dp"
+        android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:hint="Nhập tại đây"
         android:inputType="textEmailAddress"

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    FILE NÀY CHỈ DÙNG CHO MỤC ĐÍCH PREVIEW TRONG ANDROID STUDIO.
+    Nó không được sử dụng trong code Java của ứng dụng.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- 1. Bao gồm Header -->
+    <include layout="@layout/item_article_header" />
+
+    <!-- 2. Bao gồm một đoạn văn -->
+    <include layout="@layout/item_article_paragraph" />
+
+    <!-- 3. Bao gồm một hình ảnh -->
+    <include layout="@layout/item_article_image" />
+
+    <!-- 4. Bao gồm một đoạn văn khác -->
+    <include layout="@layout/item_article_paragraph" />
+
+    <!-- 5. Bao gồm phần Bình luận -->
+    <include layout="@layout/item_comment_section" />
+
+    <!-- 6. Bao gồm tiêu đề "Tin liên quan" -->
+    <include layout="@layout/item_section_header" />
+
+    <!-- 7. Bao gồm một vài tin liên quan -->
+    <include layout="@layout/item_standard_news_card" />
+    <include layout="@layout/item_standard_news_card" />
+
+</LinearLayout>

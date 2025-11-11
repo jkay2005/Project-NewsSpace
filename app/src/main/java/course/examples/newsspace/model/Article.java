@@ -3,13 +3,14 @@ package course.examples.newsspace.model;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Lớp Model đa năng, có thể biểu diễn cho một bài báo (Article),
- * một tin tức từ RSS (RssItem), hoặc một bài blog.
- * Lớp này được thiết kế để linh hoạt cho việc hiển thị trên giao diện.
+ * Lớp Model đa năng, đại diện cho một bài báo.
+ * Chứa các trường được ánh xạ từ JSON response của API và các trường/phương thức
+ * bổ sung để hỗ trợ hiển thị trên giao diện.
  */
 public class Article {
 
-    // Các trường dữ liệu chính, ánh xạ từ JSON
+    // --- CÁC TRƯỜNG DỮ LIỆU ÁNH XẠ TỪ API ---
+
     @SerializedName("id")
     private int id;
 
@@ -17,50 +18,48 @@ public class Article {
     private String title;
 
     @SerializedName("content")
-    private String content; // Nội dung chi tiết, có thể chứa HTML
+    private String content;
+
+    @SerializedName("authorId")
+    private int authorId;
 
     @SerializedName("author")
     private Author author;
 
-    @SerializedName("createdAt") // Dùng cho Article từ API
+    @SerializedName("createdAt")
     private String createdAt;
 
-    @SerializedName("publishedAt") // Dùng cho RssItem từ API
-    private String publishedAt;
+    // --- CÁC TRƯỜNG BỔ SUNG CHO GIAO DIỆN (KHÔNG CÓ TRONG JSON) ---
 
-    // Trường bổ sung, không có trong JSON, dùng để điều khiển giao diện
     private boolean isFeatured;
-    private String imageUrl; // Trường để lưu URL ảnh đã được xử lý
+    private String imageUrl;
+    private String date; // Trường date đã được xử lý
+    private String description; // Trường description đã được xử lý
 
+    // --- CONSTRUCTORS (Dùng để tạo đối tượng từ code, không phải từ Gson) ---
 
-    // --- CONSTRUCTORS ---
-
-    // Constructor rỗng - Rất hữu ích cho Gson và các thư viện khác
-    public Article() {} // Constructor rỗng cho Gson
-
-// --- STATIC FACTORY METHODS ---
+    // Constructor rỗng - Bắt buộc phải có để Gson hoạt động chính xác
+    public Article() {}
 
     public static Article createFeaturedArticle(String title, String description, String imageUrl) {
         Article article = new Article();
         article.title = title;
-        article.content = description;
+        article.description = description;
         article.imageUrl = imageUrl;
         article.isFeatured = true;
-        article.publishedAt = ""; // Gán mặc định
         return article;
     }
 
     public static Article createStandardArticle(String title, String date, String imageUrl) {
         Article article = new Article();
         article.title = title;
-        article.publishedAt = date;
+        article.date = date;
         article.imageUrl = imageUrl;
         article.isFeatured = false;
-        article.content = ""; // Gán mặc định
         return article;
     }
 
-    // --- GETTERS (Phần quan trọng để sửa lỗi) ---
+    // --- GETTERS (PHẦN QUAN TRỌNG NHẤT ĐỂ SỬA LỖI) ---
 
     public int getId() {
         return id;
@@ -70,47 +69,64 @@ public class Article {
         return title;
     }
 
-    /**
-     * Trả về mô tả ngắn. Đối với thẻ featured, chúng ta dùng trường 'content' để lưu nó.
-     */
-    public String getDescription() {
-        // Nếu content rỗng, trả về chuỗi rỗng thay vì null để tránh lỗi
-        return content != null ? content : "";
+    public String getContent() {
+        return content;
     }
 
-    /**
-     * Trả về ngày đăng. Ưu tiên 'createdAt', nếu không có thì dùng 'publishedAt'.
-     */
-    public String getDate() {
-        if (createdAt != null) {
-            // TODO: Định dạng lại chuỗi ngày tháng cho đẹp hơn
-            return createdAt.substring(0, 10); // Lấy YYYY-MM-DD
-        }
-        if (publishedAt != null) {
-            return publishedAt;
-        }
-        return ""; // Trả về chuỗi rỗng nếu không có ngày nào
-    }
-
-    /**
-     * Trả về URL của hình ảnh.
-     */
-    public String getImageUrl() {
-        // Nếu trường imageUrl đã được gán (từ constructor), dùng nó.
-        if (imageUrl != null) {
-            return imageUrl;
-        }
-        // Nếu không, thử phân tích từ 'content' (logic này có thể được thêm vào sau)
-        // ...
-        // Trả về một ảnh mẫu nếu không có gì cả
-        return "https://picsum.photos/400/200";
-    }
-
-    public boolean isFeatured() {
-        return isFeatured;
+    public int getAuthorId() {
+        return authorId;
     }
 
     public Author getAuthor() {
         return author;
     }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    // --- CÁC GETTERS TÙY CHỈNH CHO GIAO DIỆN ---
+
+    public boolean isFeatured() {
+        return isFeatured;
+    }
+
+    public String getImageUrl() {
+        // Ưu tiên URL đã được gán sẵn
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            return imageUrl;
+        }
+        // TODO: Thêm logic trích xuất ảnh từ 'content' nếu cần
+        return "https://picsum.photos/400/200"; // Trả về ảnh mẫu nếu không có
+    }
+
+    public String getDate() {
+        // Ưu tiên ngày đã được gán sẵn
+        if (date != null && !date.isEmpty()) {
+            return date;
+        }
+        // Nếu không, lấy từ 'createdAt' và định dạng lại
+        if (createdAt != null && createdAt.length() >= 10) {
+            return createdAt.substring(0, 10); // Lấy phần YYYY-MM-DD
+        }
+        return ""; // Trả về rỗng nếu không có
+    }
+
+    public String getDescription() {
+        // Ưu tiên mô tả đã được gán sẵn
+        if (description != null && !description.isEmpty()) {
+            return description;
+        }
+        // Nếu không, có thể lấy một đoạn ngắn từ 'content'
+        if (content != null && content.length() > 150) {
+            return content.substring(0, 150) + "...";
+        }
+        return content != null ? content : "";
+    }
+
+    // (Tùy chọn) Thêm Getter cho Category, nếu API trả về
+    // Ví dụ, nếu API trả về một đối tượng Category
+     @SerializedName("category")
+    private Category category;
+    public Category getCategory() { return category; }
 }

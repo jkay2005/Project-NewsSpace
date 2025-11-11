@@ -1,102 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Sử dụng LinearLayout làm gốc vì cấu trúc tổng thể là từ trên xuống dưới -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="@dimen/spacing_medium">
+    android:layout_height="match_parent"
+    tools:context=".ArticleDetailFragment">
 
-    <!-- Hàng đầu tiên: Chuyên mục (trái) và Ngày đăng (phải) -->
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <!-- Thanh Toolbar ở trên cùng -->
+    <!-- ID "toolbar" sẽ giải quyết lỗi 'Cannot resolve symbol 'toolbar'' -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:titleCentered="true"
+        tools:title="Thời sự" />
 
-        <TextView
-            android:id="@+id/categoryTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:textColor="@color/primary_blue"
-            android:textStyle="bold"
-            tools:text="Thời sự" />
+    <!-- RecyclerView để hiển thị toàn bộ nội dung bài báo -->
+    <!-- ID "articleRecyclerView" sẽ giải quyết lỗi 'Cannot resolve symbol 'articleRecyclerView'' -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/articleRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:listitem="@layout/preview_article_detail_list" />
 
-        <TextView
-            android:id="@+id/dateTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:textColor="@color/text_secondary"
-            android:textSize="@dimen/text_size_date"
-            tools:text="03/11/2025 20:10 GMT+7" />
-    </RelativeLayout>
+    <!-- (Tùy chọn) ProgressBar cho trạng thái loading -->
+<!--    <ProgressBar-->
+<!--        android:id="@+id/progressBar"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:visibility="gone"-->
+<!--        tools:visibility="visible"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"/>-->
 
-    <!-- Tiêu đề chính của bài báo -->
-    <TextView
-        android:id="@+id/titleTextView"
-        style="@style/TextAppearance.App.NewsTitle.Large"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_small"
-        tools:text="Review giả khi bán hàng online có được coi là 'thông tin sai sự thật'?" />
-
-    <!-- Hàng cuối cùng: Thông tin tác giả (trái) và các icon chức năng (phải) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_medium"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <!-- Avatar tác giả -->
-        <ImageView
-            android:id="@+id/authorAvatarImageView"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_avatar_placeholder1" />
-
-        <!-- Tên tác giả -->
-        <TextView
-            android:id="@+id/authorNameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textColor="@color/text_secondary"
-            tools:text="Tuyến Phan" />
-
-        <!-- Spacer: Một View rỗng với layout_weight=1 để đẩy các icon chức năng về phía bên phải -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- Icon thay đổi cỡ chữ -->
-        <ImageView
-            android:id="@+id/fontSizeImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_font_size"
-            android:padding="4dp" /> <!-- Thêm padding để vùng click lớn hơn -->
-
-        <!-- Icon Bookmark -->
-        <ImageView
-            android:id="@+id/bookmarkImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/ic_bookmark_border"
-            android:padding="4dp" /> <!-- Thêm padding để vùng click lớn hơn -->
-
-    </LinearLayout>
-
-    <!-- Đường kẻ phân cách với nội dung bên dưới -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/spacing_medium"
-        android:background="#1F000000" />
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/spacing_medium">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/categoryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/primary_blue"
+            android:textStyle="bold"
+            tools:text="Thời sự" />
+
+        <TextView
+            android:id="@+id/dateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_size_date"
+            tools:text="03/11/2025 20:10 GMT+7" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/titleTextView"
+        style="@style/TextAppearance.App.NewsTitle.Large"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_small"
+        tools:text="Review giả khi bán hàng online có được coi là 'thông tin sai sự thật'?" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/authorAvatarImageView"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_avatar_placeholder" />
+
+        <TextView
+            android:id="@+id/authorNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/text_secondary"
+            tools:text="Tuyến Phan" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/fontSizeImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_font_size"
+            android:padding="4dp" />
+
+        <ImageView
+            android:id="@+id/bookmarkImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_bookmark_border"
+            android:padding="4dp" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/spacing_medium"
+        android:background="#1F000000" />
+
+</LinearLayout>

@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide; // Thư viện tải ảnh, cần thêm vào build.gradle
@@ -138,8 +139,8 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             // Gán sự kiện click cho từng Chip
             chip.setOnClickListener(v -> {
                 // SỬA LỖI: Sử dụng ID action mới
-                HomeFragmentDirections.ActionHomeToCategory action =
-                        HomeFragmentDirections.actionHomeToCategory(categoryName);
+                HomeFragmentDirections.ActionHomeFragmentToCategoryNewsFragment action =
+                        HomeFragmentDirections.actionHomeFragmentToCategoryNewsFragment(categoryName);
                 Navigation.findNavController(v).navigate(action);
             });
             holder.binding.categoryChipGroup.addView(chip);
@@ -188,9 +189,15 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     .placeholder(R.color.grey_200) // Màu nền tạm thời khi đang tải
                     .into(binding.newsImageView);
 
-            // Gán sự kiện click cho cả thẻ tin
+            // ======================================================
+            // == GÁN SỰ KIỆN CLICK CHO THẺ TIN TIÊU CHUẨN         ==
+            // ======================================================
             itemView.setOnClickListener(v -> {
-                // Điều hướng sang ArticleDetailFragment
+                // Tương tự như trên, tạo action từ HomeFragment
+                HomeFragmentDirections.ActionHomeFragmentToArticleDetailFragment action =
+                        HomeFragmentDirections.actionHomeFragmentToArticleDetailFragment(article.getId());
+
+                Navigation.findNavController(v).navigate(action);
             });
         }
     }
@@ -214,9 +221,17 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     .placeholder(R.color.grey_200)
                     .into(binding.newsImageView);
 
-            // Gán sự kiện click
+            // ======================================================
+            // == GÁN SỰ KIỆN CLICK CHO THẺ TIN NỔI BẬT            ==
+            // ======================================================
             itemView.setOnClickListener(v -> {
-                // Điều hướng sang ArticleDetailFragment
+                // Tạo action để điều hướng từ HomeFragment sang ArticleDetailFragment
+                // và truyền vào ID của bài báo đã được click.
+                HomeFragmentDirections.ActionHomeFragmentToArticleDetailFragment action =
+                        HomeFragmentDirections.actionHomeFragmentToArticleDetailFragment(article.getId());
+
+                // Tìm NavController từ View đã được click và thực hiện điều hướng
+                Navigation.findNavController(v).navigate(action);
             });
         }
     }

@@ -14,10 +14,12 @@
         tools:layout="@layout/fragment_home" >
         <!-- SỬA LỖI: Đổi ID thành tên đơn giản hơn để kích hoạt lại code generation -->
         <action
-            android:id="@+id/action_home_to_category"
+            android:id="@+id/action_homeFragment_to_categoryNewsFragment"
             app:destination="@id/categoryNewsFragment" />
+
+        <!-- Sửa lại ID này để khớp với code Java đang gọi -->
         <action
-            android:id="@+id/action_nav_home_to_articleDetailFragment"
+            android:id="@+id/action_homeFragment_to_articleDetailFragment"
             app:destination="@id/articleDetailFragment" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
@@ -35,7 +37,11 @@
         android:id="@+id/nav_bookmark"
         android:name="course.examples.newsspace.BookmarkFragment"
         android:label="fragment_bookmark"
-        tools:layout="@layout/fragment_bookmark" />
+        tools:layout="@layout/fragment_bookmark" >
+        <action
+            android:id="@+id/action_nav_bookmark_to_articleDetailFragment"
+            app:destination="@id/articleDetailFragment" />
+    </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 
     <!-- Điểm đến: SettingsFragment -->
@@ -62,7 +68,7 @@
         android:label="ArticleDetailFragment" >
         <argument
             android:name="articleId"
-            app:argType="string" />
+            app:argType="float" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 </navigation>

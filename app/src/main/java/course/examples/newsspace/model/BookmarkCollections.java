@@ -1,4 +1,4 @@
-package course.examples.newsspace;
+package course.examples.newsspace.model;
 
 import java.util.List;
 

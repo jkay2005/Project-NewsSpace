@@ -1,7 +1,6 @@
 package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,6 +11,8 @@ import java.util.List;
 import course.examples.newsspace.databinding.ItemBookmarkCollectionsBinding;
 import course.examples.newsspace.databinding.ItemHomeHeaderBinding;
 import course.examples.newsspace.databinding.ItemStandardNewsCardBinding;
+import course.examples.newsspace.model.Article;
+import course.examples.newsspace.model.BookmarkCollections;
 
 public class BookmarkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

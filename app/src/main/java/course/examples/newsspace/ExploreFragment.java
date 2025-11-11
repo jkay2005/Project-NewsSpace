@@ -26,6 +26,22 @@ public class ExploreFragment extends Fragment {
     private List<Article> articleList = new ArrayList<>();
 
     // ... onCreateView, onDestroyView ...
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Khởi tạo đối tượng ViewBinding từ file layout fragment_explore.xml
+        binding = FragmentExploreBinding.inflate(inflater, container, false);
+        // Trả về View gốc của layout để hệ thống hiển thị
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Gán binding về null để tránh rò rỉ bộ nhớ (memory leak)
+        // khi View của Fragment đã bị hủy.
+        binding = null;
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

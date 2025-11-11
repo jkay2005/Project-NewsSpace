@@ -53,7 +53,12 @@ public interface ApiService {
     @POST("api/articles")
     Call<Article> createArticle(@Body CreateArticleRequest articleRequest); // Cần tạo lớp CreateArticleRequest
 
-
+    /**
+     * Lấy thông tin chi tiết của một bài báo dựa trên ID.
+     * @param articleId ID của bài báo cần lấy.
+     */
+    @GET("api/articles/{id}")
+    Call<Article> getArticleDetail(@Path("id") int articleId);
     // ======================================================
     // RSS API - API Quản lý và Lấy tin RSS
     // ======================================================
@@ -146,5 +151,13 @@ public interface ApiService {
      */
     @PUT("api/admin/users/{id}")
     Call<User> updateUser(@Path("id") int userId, @Body UpdateUserRequest updateUserRequest);
+
+    // Trong ApiService.java
+    @GET("api/bookmarks")
+    Call<BookmarkResponse> getBookmarks();
+
+    @POST("api/bookmarks/collections")
+    Call<Void> createBookmarkCollection(@Body Map<String, String> nameBody); // Gửi {"name": "Tên mới"}
+
 
 }
