@@ -42,6 +42,21 @@ public class RssSource {
     public boolean isActive() {
         return active;
     }
+
+    //test
+
+    // Constructor rỗng cho Gson
+    public RssSource() {}
+
+    // Constructor tiện lợi để tạo dữ liệu giả
+    public RssSource(String name, String tag) {
+        this.name = name;
+        this.tag = tag;
+    }
+    public void setId(int id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setTag(String tag) { this.tag = tag; }
+
 }
 
     // Getters...

@@ -10,6 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="80dp" /> <!-- Thêm padding dưới để không bị BottomAppBar che -->
+        android:paddingBottom="140dp" /> <!-- Thêm padding dưới để không bị BottomAppBar che -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

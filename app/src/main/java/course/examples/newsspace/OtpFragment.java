@@ -58,19 +58,19 @@ public class OtpFragment extends Fragment {
 
         showLoading(true);
 
-        // *** GIẢ LẬP GỌI API XÁC THỰC OTP ***
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            showLoading(false);
-
-            if (otp.equals("123456")) { // Giả sử mã OTP đúng
-                // Nếu xác thực thành công, chuyển sang màn hình Thành công
-                // Bạn cần tạo action này trong auth_nav_graph.xml
-                NavHostFragment.findNavController(OtpFragment.this)
-                        .navigate(R.id.action_otpFragment_to_registerSuccessFragment);
-            } else {
-                showErrorDialog("Thất bại", "Mã OTP không chính xác.");
-            }
-        }, 2000);
+//        // *** GIẢ LẬP GỌI API XÁC THỰC OTP ***
+//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+//            showLoading(false);
+//
+//            if (otp.equals("123456")) { // Giả sử mã OTP đúng
+//                // Nếu xác thực thành công, chuyển sang màn hình Thành công
+//                // Bạn cần tạo action này trong auth_nav_graph.xml
+//                NavHostFragment.findNavController(OtpFragment.this)
+//                        .navigate(R.id.action_otpFragment_to_registerSuccessFragment);
+//            } else {
+//                showErrorDialog("Thất bại", "Mã OTP không chính xác.");
+//            }
+//        }, 2000);
     }
 
     private void handleResendOtp() {

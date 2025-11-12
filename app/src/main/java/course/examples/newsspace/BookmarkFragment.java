@@ -72,8 +72,8 @@ public class BookmarkFragment extends Fragment implements CreateBookmarkCollecti
     private void loadBookmarkData() {
         // TODO: Hiển thị trạng thái loading
 
-        /*
-        // === PHẦN GỌI API THẬT SỰ (HIỆN ĐANG COMMENT OUT) ===
+
+        // === PHẦN GỌI API THẬT SỰ ===
         // TODO: Bỏ comment phần này khi backend có API cho bookmark
 
         ApiClient.getApiService(requireContext()).getBookmarks().enqueue(new Callback<BookmarkResponse>() {
@@ -103,24 +103,24 @@ public class BookmarkFragment extends Fragment implements CreateBookmarkCollecti
                 Toast.makeText(getContext(), "Lỗi mạng, không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
             }
         });
-        */
 
-        // === PHẦN DÙNG DỮ LIỆU GIẢ (ĐỂ TEST GIAO DIỆN) ===
-        // TODO: Xóa phần này khi đã có API thật
-        allCollections.clear();
-        allCollections.add("Đọc sau");
-        allCollections.add("Đã lưu");
-        allCollections.add("Thời sự");
 
-        allSavedArticles.clear();
-        for (int i = 0; i < 8; i++) {
-            allSavedArticles.add(Article.createStandardArticle(
-                    "Bài báo đã lưu thứ " + (i + 1),
-                    "4/10/2025",
-                    "https://picsum.photos/200?random=" + i // Thêm random để ảnh khác nhau
-            ));
-        }
-        buildDisplayList(); // Xây dựng giao diện từ dữ liệu giả
+//        // === PHẦN DÙNG DỮ LIỆU GIẢ (ĐỂ TEST GIAO DIỆN) ===
+//        // TODO: Xóa phần này khi đã có API thật
+//        allCollections.clear();
+//        allCollections.add("Đọc sau");
+//        allCollections.add("Đã lưu");
+//        allCollections.add("Thời sự");
+//
+//        allSavedArticles.clear();
+//        for (int i = 0; i < 8; i++) {
+//            allSavedArticles.add(Article.createStandardArticle(
+//                    "Bài báo đã lưu thứ " + (i + 1),
+//                    "4/10/2025",
+//                    "https://picsum.photos/200?random=" + i // Thêm random để ảnh khác nhau
+//            ));
+//        }
+//        buildDisplayList(); // Xây dựng giao diện từ dữ liệu giả
     }
 
     /**
@@ -151,8 +151,8 @@ public class BookmarkFragment extends Fragment implements CreateBookmarkCollecti
     public void onCollectionCreated(String collectionName) {
         // TODO: Hiển thị loading
 
-        /*
-        // === PHẦN GỌI API THẬT SỰ (HIỆN ĐANG COMMENT OUT) ===
+
+        // === PHẦN GỌI API THẬT SỰ  ===
         Map<String, String> body = new HashMap<>();
         body.put("name", collectionName);
 
@@ -174,12 +174,12 @@ public class BookmarkFragment extends Fragment implements CreateBookmarkCollecti
                 Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
             }
         });
-        */
+
 
         // === PHẦN DÙNG DỮ LIỆU GIẢ (ĐỂ TEST GIAO DIỆN) ===
-        Toast.makeText(getContext(), "Đã tạo bộ sưu tập: " + collectionName, Toast.LENGTH_SHORT).show();
-        allCollections.add(collectionName); // Thêm vào danh sách giả
-        buildDisplayList(); // Cập nhật lại giao diện
+//        Toast.makeText(getContext(), "Đã tạo bộ sưu tập: " + collectionName, Toast.LENGTH_SHORT).show();
+//        allCollections.add(collectionName); // Thêm vào danh sách giả
+//        buildDisplayList(); // Cập nhật lại giao diện
     }
 
     @Override

@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_homeFragment_to_articleDetailFragment"
             app:destination="@id/articleDetailFragment" />
+        <action
+            android:id="@+id/action_nav_home_to_nav_bookmark"
+            app:destination="@id/nav_bookmark" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 
@@ -29,7 +32,11 @@
         android:id="@+id/nav_explore"
         android:name="course.examples.newsspace.ExploreFragment"
         android:label="fragment_explore"
-        tools:layout="@layout/fragment_explore" />
+        tools:layout="@layout/fragment_explore" >
+        <action
+            android:id="@+id/action_nav_explore_to_articleDetailFragment"
+            app:destination="@id/articleDetailFragment" />
+    </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 
     <!-- Điểm đến: BookmarkFragment -->
@@ -39,7 +46,7 @@
         android:label="fragment_bookmark"
         tools:layout="@layout/fragment_bookmark" >
         <action
-            android:id="@+id/action_nav_bookmark_to_articleDetailFragment"
+            android:id="@+id/action_bookmarkFragment_to_articleDetailFragment"
             app:destination="@id/articleDetailFragment" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
@@ -68,7 +75,7 @@
         android:label="ArticleDetailFragment" >
         <argument
             android:name="articleId"
-            app:argType="float" />
+            app:argType="integer" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 </navigation>

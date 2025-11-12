@@ -20,7 +20,6 @@ import java.util.List;
 
 // Import lớp ViewBinding tương ứng với file layout
 import course.examples.newsspace.databinding.FragmentArticleDetailBinding;
-import course.examples.newsspace.databinding.ItemArticleHeaderBinding;
 import course.examples.newsspace.model.Article;
 import course.examples.newsspace.model.ArticleHeader;
 import course.examples.newsspace.model.ArticleImage;
@@ -70,7 +69,7 @@ public class ArticleDetailFragment extends Fragment
         setupToolbar();
         setupRecyclerView();
         if (articleId != -1) {
-            loadArticleContent();
+            loadArticleContent(articleId);
         } else {
             Toast.makeText(getContext(), "Lỗi: Không tìm thấy ID bài báo.", Toast.LENGTH_LONG).show();
             NavHostFragment.findNavController(this).navigateUp();
@@ -115,36 +114,68 @@ public class ArticleDetailFragment extends Fragment
 
     // --- CÁC PHƯƠNG THỨC XỬ LÝ DỮ LIỆU VÀ API ---
 
-    private void loadArticleContent() {
-        ApiClient.getApiService(requireContext()).getArticleDetail(articleId).enqueue(new Callback<Article>() {
+    private void loadArticleContent(int articleId) {
+        // 1. Hiển thị trạng thái loading
+        binding.progressBar.setVisibility(View.VISIBLE);
+        binding.articleRecyclerView.setVisibility(View.INVISIBLE); // Dùng INVISIBLE để layout không bị nhảy
+        //2.gọi api
+        ApiClient.getApiService(requireContext()).getArticleDetail(this.articleId).enqueue(new Callback<Article>() {
             @Override
             public void onResponse(@NonNull Call<Article> call, @NonNull Response<Article> response) {
+                binding.progressBar.setVisibility(View.GONE);
+                binding.articleRecyclerView.setVisibility(View.VISIBLE);
+
                 if (response.isSuccessful() && response.body() != null) {
                     Article article = response.body();
                     buildDisplayList(article);
+                } else {
+                    // 5. API trả về lỗi (404, 500...)
+                    Toast.makeText(getContext(), "Không thể tải nội dung bài báo. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onFailure(@NonNull Call<Article> call, @NonNull Throwable t) {
+                // 6. Lỗi mạng
+                binding.progressBar.setVisibility(View.GONE);
                 Log.e("ArticleDetailFragment", "API Call Failed: " + t.getMessage());
+                Toast.makeText(getContext(), "Lỗi mạng. Vui lòng kiểm tra kết nối.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void buildDisplayList(Article article) {
         contentList.clear();
+
+        // Giả sử API trả về chuyên mục, nếu không, bạn có thể gán cứng
         String category = "Tin tức";
-        if (article.getCategory() != null) { // Sửa lỗi 'getCategory'
+        if (article.getCategory() != null && article.getCategory().getName() != null) {
             category = article.getCategory().getName();
         }
-        binding.toolbar.setTitle("Some Category");
-        contentList.add(new ArticleHeader(category, article.getTitle(), article.getAuthor().getName(), article.getDate())); // Sửa lỗi 'getName'
-        if (article.getContent() != null) { // Sửa lỗi 'getContent'
-            contentList.add(new ArticleParagraph(article.getContent()));
+        binding.toolbar.setTitle(category); // Cập nhật tiêu đề Toolbar
+
+        // 1. Thêm Header
+        contentList.add(new ArticleHeader(category, article.getTitle(), article.getAuthor().getName(), article.getDate()));
+
+        // 2. Phân tích nội dung (ví dụ đơn giản)
+        if (article.getContent() != null && !article.getContent().isEmpty()) {
+            // TODO: Triển khai một trình phân tích HTML/Markdown tốt hơn
+            String[] parts = article.getContent().split("<img_separator>");
+            for (String part : parts) {
+                if (part.startsWith("http")) {
+                    contentList.add(new ArticleImage(part.trim(), ""));
+                } else if (!part.trim().isEmpty()){
+                    contentList.add(new ArticleParagraph(part.trim()));
+                }
+            }
         }
+
+        // 3. Thêm phần bình luận và tin liên quan
         contentList.add(new CommentSection());
         contentList.add(new RelatedNewsHeader());
-        adapter.notifyDataSetChanged(); // Sửa lỗi 'notifyDataSetChanged'
+        // TODO: Thêm danh sách tin liên quan nếu API trả về
+
+        // 4. Thông báo cho adapter
+        adapter.notifyDataSetChanged();
     }
 
     // --- IMPLEMENT CÁC PHƯƠNG THỨC CALLBACK ---

@@ -110,6 +110,12 @@ public interface ApiService {
     @PUT("api/recommendations/preferences")
     Call<UpdatePreferencesRequest> updatePreferences(@Body UpdatePreferencesRequest preferencesRequest);
 
+    @GET("api/recommendations/preferences")
+    Call<UpdatePreferencesRequest> getUserPreferences(); // Tái sử dụng model
+
+    @GET("api/categories")
+    Call<List<Category>> getAllCategories();
+
     /**
      * Gửi phản hồi về một item được gợi ý.
      */

@@ -42,14 +42,31 @@ public class RssItem {
     }
 
     // Phương thức lấy URL ảnh (như đã thảo luận trước)
+//    public String getImageUrl() {
+//        if (content != null && !content.isEmpty()) {
+//            Document doc = Jsoup.parse(content);
+//            Element image = doc.select("img").first();
+//            if (image != null) {
+//                return image.attr("src");
+//            }
+//        }
+//        return "https://picsum.photos/400/200"; // Trả về ảnh mẫu nếu không tìm thấy
+//    }
+
+    public RssItem() {} // Constructor rỗng
+
+    // Setters - Rất hữu ích để tạo dữ liệu giả
+    public void setId(int id) { this.id = id; }
+    public void setTitle(String title) { this.title = title; }
+    public void setContent(String content) { this.content = content; }
+    public void setPublishedAt(String publishedAt) { this.publishedAt = publishedAt; }
+    public void setAuthor(String author) { this.author = author; }
+    public void setSource(RssSource source) { this.source = source; }
+
+    // Phương thức lấy URL ảnh
     public String getImageUrl() {
-        if (content != null && !content.isEmpty()) {
-            Document doc = Jsoup.parse(content);
-            Element image = doc.select("img").first();
-            if (image != null) {
-                return image.attr("src");
-            }
-        }
-        return "https://picsum.photos/400/200"; // Trả về ảnh mẫu nếu không tìm thấy
+        // Tạm thời trả về một URL ảnh ngẫu nhiên khác nhau cho mỗi item
+        return "https://picsum.photos/400/200?random=" + id;
     }
+
 }

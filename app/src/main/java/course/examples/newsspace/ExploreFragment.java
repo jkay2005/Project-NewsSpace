@@ -1,46 +1,47 @@
 package course.examples.newsspace;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import course.examples.newsspace.model.Article;
 import com.google.android.material.chip.Chip;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import course.examples.newsspace.databinding.FragmentExploreBinding;
-
+import course.examples.newsspace.model.Article;
+import course.examples.newsspace.model.RssItem; // Dùng để hứng dữ liệu từ RecommendationResponse
+import course.examples.newsspace.model.UpdatePreferencesRequest;
+import course.examples.newsspace.model.RecommendationResponse;
+import course.examples.newsspace.api.ApiClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ExploreFragment extends Fragment {
 
     private FragmentExploreBinding binding;
     private ArticleListAdapter newsAdapter;
-    private List<Article> articleList = new ArrayList<>();
+    private final List<Article> articleList = new ArrayList<>();
+    private final List<String> allTopics = Arrays.asList(
+            "Thời sự", "Chính trị", "Thế giới", "Tiêu dùng", "Đời sống", "Du lịch",
+            "Văn hóa", "Giải trí", "Giáo dục", "Thể thao", "Sức khỏe", "Công nghệ",
+            "Thời trang", "Xe", "Kinh tế"
+    );
 
-    // ... onCreateView, onDestroyView ...
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Khởi tạo đối tượng ViewBinding từ file layout fragment_explore.xml
         binding = FragmentExploreBinding.inflate(inflater, container, false);
-        // Trả về View gốc của layout để hệ thống hiển thị
         return binding.getRoot();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        // Gán binding về null để tránh rò rỉ bộ nhớ (memory leak)
-        // khi View của Fragment đã bị hủy.
-        binding = null;
     }
 
     @Override
@@ -48,15 +49,16 @@ public class ExploreFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         setupNewsRecyclerView();
-        loadNewsData();
         setupTopicChips();
+        setupClickListeners();
 
-        // THAY ĐỔI 1: Gán sự kiện click cho nút "Tùy chỉnh" mới trong header
-        // Truy cập thông qua binding của layout cha -> binding của layout được include -> id của nút
+        // Ban đầu, tải và hiển thị tin tức gợi ý
+        loadRecommendedNews();
+    }
+
+    private void setupClickListeners() {
         binding.headerLayout.customizeButtonInHeader.setOnClickListener(v -> showCustomizeView());
-
-        // Nút "Xác nhận" không thay đổi
-        binding.confirmButton.setOnClickListener(v -> showNewsView());
+        binding.confirmButton.setOnClickListener(v -> handleConfirmSelection());
     }
 
     private void setupNewsRecyclerView() {
@@ -66,44 +68,126 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupTopicChips() {
-        // Giả lập danh sách các chủ đề
-        String[] topics = {"Thời sự", "Chính trị", "Thế giới", "Tiêu dùng", "Đời sống", "Du lịch",
-                "Văn hóa", "Giải trí", "Giáo dục", "Thể thao", "Sức khỏe", "Công nghệ", "Thời trang", "Xe", "Kinh tế"};
-
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        for (String topic : topics) {
+        binding.topicChipGroup.removeAllViews();
+        for (String topic : allTopics) {
             Chip chip = (Chip) inflater.inflate(R.layout.chip_choice, binding.topicChipGroup, false);
             chip.setText(topic);
             binding.topicChipGroup.addView(chip);
         }
     }
 
-    // Hiển thị màn hình tùy chỉnh, ẩn màn hình tin tức
     private void showCustomizeView() {
         binding.newsRecyclerView.setVisibility(View.GONE);
+        binding.headerLayout.customizeButtonInHeader.setVisibility(View.INVISIBLE);
         binding.customizeLayout.setVisibility(View.VISIBLE);
-        // THAY ĐỔI 2: Xóa dòng code liên quan đến nút "Tùy chỉnh" cũ
-        // binding.customizeButton.setVisibility(View.GONE);
+        // TODO: Lấy sở thích hiện tại của người dùng và check vào các Chip tương ứng
     }
 
-    // Hiển thị màn hình tin tức, ẩn màn hình tùy chỉnh
-    // Hiển thị màn hình tin tức, ẩn màn hình tùy chỉnh
     private void showNewsView() {
         binding.customizeLayout.setVisibility(View.GONE);
         binding.newsRecyclerView.setVisibility(View.VISIBLE);
-        // THAY ĐỔI 3: Xóa dòng code liên quan đến nút "Tùy chỉnh" cũ
-        // binding.customizeButton.setVisibility(View.VISIBLE);
-
-        // TODO: Dựa vào các chip đã chọn để tải lại danh sách tin tức
-        // loadNewsData();
+        binding.headerLayout.customizeButtonInHeader.setVisibility(View.VISIBLE);
     }
 
-    private void loadNewsData() {
-        // Tái sử dụng logic tải dữ liệu tin tức đã có
-        articleList.clear();
-        for (int i = 0; i < 15; i++) {
-            //articleList.add(new Article("Bé trai trôi giữa dòng nước...", "4/10/2025", "url", false));
+    /**
+     * Lấy các chủ đề đã chọn và gửi lên server.
+     */
+    private void handleConfirmSelection() {
+        showLoading(true, "Đang cập nhật sở thích...");
+
+        List<String> selectedTopics = getSelectedTopics();
+        UpdatePreferencesRequest request = new UpdatePreferencesRequest(selectedTopics);
+
+        ApiClient.getApiService(requireContext()).updatePreferences(request).enqueue(new Callback<UpdatePreferencesRequest>() {
+            @Override
+            public void onResponse(@NonNull Call<UpdatePreferencesRequest> call, @NonNull Response<UpdatePreferencesRequest> response) {
+                showLoading(false, null);
+                if (response.isSuccessful()) {
+                    // Cập nhật sở thích thành công, giờ tải lại tin tức
+                    showNewsView();
+                    loadRecommendedNews();
+                } else {
+                    Toast.makeText(getContext(), "Cập nhật sở thích thất bại", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<UpdatePreferencesRequest> call, @NonNull Throwable t) {
+                showLoading(false, null);
+                Log.e("ExploreFragment", "Update Prefs Failed: " + t.getMessage());
+                Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Tải danh sách tin tức được gợi ý từ API.
+     */
+    private void loadRecommendedNews() {
+        showLoading(true, "Đang tải tin cho bạn...");
+
+        ApiClient.getApiService(requireContext()).getRecommendations().enqueue(new Callback<RecommendationResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<RecommendationResponse> call, @NonNull Response<RecommendationResponse> response) {
+                showLoading(false, null);
+                if (response.isSuccessful() && response.body() != null) {
+                    RecommendationResponse data = response.body();
+
+                    // Lấy danh sách tin RSS từ response (giả sử chỉ dùng tin RSS)
+                    List<RssItem> recommendedItems = data.getRss();
+
+                    // Chuyển đổi và cập nhật UI
+                    articleList.clear();
+                    if (recommendedItems != null) {
+                        for (RssItem item : recommendedItems) {
+                            articleList.add(Article.createStandardArticle(
+                                    item.getTitle(),
+                                    item.getPublishedAt(),
+                                    item.getImageUrl()
+                            ));
+                        }
+                    }
+                    newsAdapter.notifyDataSetChanged();
+
+                } else {
+                    Toast.makeText(getContext(), "Không thể tải tin tức gợi ý", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<RecommendationResponse> call, @NonNull Throwable t) {
+                showLoading(false, null);
+                Log.e("ExploreFragment", "Get Recommendations Failed: " + t.getMessage());
+                Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private List<String> getSelectedTopics() {
+        List<String> selected = new ArrayList<>();
+        for (int i = 0; i < binding.topicChipGroup.getChildCount(); i++) {
+            Chip chip = (Chip) binding.topicChipGroup.getChildAt(i);
+            if (chip.isChecked()) {
+                selected.add(chip.getText().toString());
+            }
         }
-        newsAdapter.notifyDataSetChanged();
+        return selected;
+    }
+
+    // Hàm helper để quản lý trạng thái loading
+    private void showLoading(boolean isLoading, @Nullable String message) {
+        // TODO: Implement một giao diện loading tốt hơn
+        if (isLoading) {
+            // Hiển thị ProgressBar, có thể kèm theo text
+        } else {
+            // Ẩn ProgressBar
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

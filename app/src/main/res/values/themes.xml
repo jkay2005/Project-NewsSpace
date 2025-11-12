@@ -39,11 +39,17 @@
     </style>
 
     <!-- Style cho các tab chuyên mục có thể click -->
-    <style name="Widget.App.CategoryChip" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipBackgroundColor">@color/chip_background</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <!-- Thêm các thuộc tính khác nếu cần -->
-    </style>
+    <style name="Widget.App.CategoryChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <!-- Màu nền thay đổi theo trạng thái -->
+        <item name="chipBackgroundColor">@color/chip_choice_background_selector</item>
+        <!-- Màu chữ thay đổi theo trạng thái -->
+        <item name="android:textColor">@color/chip_text_color_selector</item>
+        <!-- Luôn có viền màu xanh -->
+        <item name="chipStrokeColor">@color/primary_blue</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <!-- (Tùy chọn) Bỏ icon check mặc định -->
+        <item name="checkedIcon">@null</item>
+    </style>```
 
 <!--    &lt;!&ndash; Style cho các tiêu đề tin tức &ndash;&gt;-->
 <!--    <style name="TextAppearance.App.NewsTitle.Large" parent="TextAppearance.MaterialComponents.Headline6">-->
@@ -68,6 +74,59 @@
         <item name="android:lineSpacingMultiplier">1.2</item>
     </style>
 
+    <!-- ========================================================== -->
+    <!-- == STYLE RIÊNG BIỆT CHỈ DÀNH CHO CHIP CÓ ICON           == -->
+    <!-- ========================================================== -->
+    <style name="Widget.App.IconOnlyChip" parent="Widget.MaterialComponents.Chip.Choice">
+        <!-- Đặt màu nền thay đổi theo trạng thái (Xanh khi check, Xám nhạt khi không) -->
+        <item name="chipBackgroundColor">@color/chip_background_selector_simple</item>
+        <!-- TẮT HOÀN TOÀN VIỆC TÔ MÀU ICON -->
+        <item name="chipIconTint">@null</item>
+        <!-- (Tùy chọn) Bỏ viền cho chip icon -->
+        <item name="chipStrokeWidth">0dp</item>
+    </style>
+
+    <!-- ========================================================== -->
+    <!-- == STYLE TÙY CHỈNH CHO BOTTOMAPPBAR VỚI CHIỀU CAO MỚI  == -->
+    <!-- ========================================================== -->
+    <style name="Widget.App.BottomAppBar" parent="Widget.MaterialComponents.BottomAppBar.Colored">
+        <!--
+            Ghi đè lại chiều cao tối thiểu của BottomAppBar.
+            56dp là chiều cao tiêu chuẩn.
+        -->
+        <item name="android:minHeight">50dp</item>
+    </style>
+    <!-- Các style khác của bạn -->
+
+<!--    <style name="App.BottomNavigationView.Text" parent="TextAppearance.AppCompat.Caption">-->
+<!--        <item name="android:textSize">@dimen/bottom_nav_text_size</item>-->
+<!--    </style>-->
+
+    <!-- File: res/values/styles.xml -->
+    <style name="App.BottomNavigationView.Text" parent="TextAppearance.AppCompat.Caption">
+        <!-- Bạn có thể điều chỉnh kích thước chữ ở đây, 11sp hoặc 12sp là hợp lý -->
+        <item name="android:textSize">12dp</item>
+    </style>
+
+    <!-- SỬA 2: Style tùy chỉnh cho BottomNavigationView để giải quyết vấn đề cân đối -->
+    <style name="Widget.App.BottomNavigationView"
+        parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemIconSize">22dp</item>
+        <item name="itemTextAppearanceActive">@style/App.BottomNavigationView.Text</item>
+        <item name="itemTextAppearanceInactive">@style/App.BottomNavigationView.Text</item>
+
+        <!-- THUỘC TÍNH QUAN TRỌNG:
+             Đặt lại padding để hệ thống tự cân chỉnh -->
+        <item name="itemPaddingTop">4dp</item>
+        <item name="itemPaddingBottom">4dp</item>
+    </style>
 
 
+
+    <!-- Các style khác của bạn -->
+
+    <!-- Style cho chữ bên trong BottomNavigationView -->
+    <!-- <style name="App.BottomNavigationView.Text" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">12sp</item>
+    </style> -->
 </resources>

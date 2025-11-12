@@ -2,6 +2,8 @@ package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -103,6 +105,25 @@ public class LoginFragment extends Fragment {
                 showValidationDialog("Lỗi kết nối", "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối internet của bạn.");
             }
         });
+
+        // ==========================================================
+        // == THÊM PHẦN GIẢ LẬP ĐĂNG NHẬP THÀNH CÔNG             ==
+        // ==========================================================
+        // Dùng Handler để giả lập độ trễ mạng, tạo cảm giác thật hơn
+//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+//            showLoading(false);
+//
+//            // Giả vờ như đã nhận được token và thông tin người dùng
+//            // Bạn không cần lưu token thật vào SessionManager lúc này
+//
+//            Toast.makeText(getContext(), "Đăng nhập thành công! (Chế độ Demo)", Toast.LENGTH_SHORT).show();
+//
+//            // Chuyển sang MainActivity
+//            Intent intent = new Intent(getActivity(), MainActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//
+//        }, 1000); // Giả lập chờ 1 giây
     }
 
     private void showLoading(boolean isLoading) {
@@ -127,4 +148,6 @@ public class LoginFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+
 }

@@ -1,5 +1,6 @@
 package course.examples.newsspace; // Thay bằng package của bạn
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -122,6 +123,9 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             // Gán sự kiện click cho toàn bộ thẻ tin
             itemView.setOnClickListener(v -> {
+                // Tạo một Bundle để chứa articleId
+                Bundle bundle = new Bundle();
+                bundle.putInt("articleId", article.getId());
                 // Tạo action để điều hướng từ CategoryNewsFragment
                 CategoryNewsFragmentDirections.ActionCategoryNewsFragmentToArticleDetailFragment action =
                         CategoryNewsFragmentDirections.actionCategoryNewsFragmentToArticleDetailFragment(article.getId());
