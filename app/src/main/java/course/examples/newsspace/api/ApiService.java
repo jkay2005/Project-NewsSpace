@@ -166,4 +166,19 @@ public interface ApiService {
     Call<Void> createBookmarkCollection(@Body Map<String, String> nameBody); // Gửi {"name": "Tên mới"}
 
 
+    public class OtpRequest {
+        private String email;
+        private String otp;
+        public OtpRequest(String email, String otp) { this.email = email; this.otp = otp; }
+    }
+
+    @POST("api/auth/verify-otp") // Giả định endpoint
+    Call<Void> verifyOtp(@Body VerifyOtpRequest request);
+
+    /**
+     * Yêu cầu gửi lại mã OTP.
+     */
+    @POST("api/auth/resend-otp") // Giả định endpoint
+    Call<Void> resendOtp(@Body ResendOtpRequest request);
+
 }

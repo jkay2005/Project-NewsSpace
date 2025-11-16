@@ -1,27 +1,33 @@
-package course.examples.newsspace;
+package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import java.util.Locale;
-import course.examples.newsspace.databinding.FragmentOtpBinding; // Thay bằng package của bạn
+
+import course.examples.newsspace.api.ApiClient;
+import course.examples.newsspace.databinding.FragmentOtpBinding;
+import course.examples.newsspace.model.ResendOtpRequest;
+import course.examples.newsspace.model.VerifyOtpRequest;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class OtpFragment extends Fragment {
 
     private FragmentOtpBinding binding;
     private CountDownTimer countDownTimer;
+
+    private String userEmail; // Biến để lưu email nhận từ màn hình trước
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,19 +39,24 @@ public class OtpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Nhận dữ liệu email từ Fragment trước bằng Safe Args
+        // Nhận và lưu email từ Fragment trước bằng Safe Args
         if (getArguments() != null) {
-            String email = OtpFragmentArgs.fromBundle(getArguments()).getEmail();
-            String description = "Chúng tôi đã gửi mã OTP đến email\n" + email;
+            userEmail = OtpFragmentArgs.fromBundle(getArguments()).getEmail();
+            String description = "Chúng tôi đã gửi mã OTP đến email\n" + userEmail;
             binding.descriptionTextView.setText(description);
+        } else {
+            // Xử lý trường hợp không nhận được email (lỗi)
+            showErrorDialog("Lỗi", "Không nhận được thông tin email.");
+            NavHostFragment.findNavController(this).navigateUp();
+            return;
         }
 
         binding.confirmButton.setOnClickListener(v -> handleOtpVerification());
         binding.resendOtpTextView.setOnClickListener(v -> handleResendOtp());
 
-        // Bắt đầu đếm ngược để cho phép gửi lại mã
         startCountdown();
     }
+
 
     private void handleOtpVerification() {
         String otp = binding.otpEditText.getText().toString().trim();
@@ -58,30 +69,65 @@ public class OtpFragment extends Fragment {
 
         showLoading(true);
 
-//        // *** GIẢ LẬP GỌI API XÁC THỰC OTP ***
-//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-//            showLoading(false);
-//
-//            if (otp.equals("123456")) { // Giả sử mã OTP đúng
-//                // Nếu xác thực thành công, chuyển sang màn hình Thành công
-//                // Bạn cần tạo action này trong auth_nav_graph.xml
-//                NavHostFragment.findNavController(OtpFragment.this)
-//                        .navigate(R.id.action_otpFragment_to_registerSuccessFragment);
-//            } else {
-//                showErrorDialog("Thất bại", "Mã OTP không chính xác.");
-//            }
-//        }, 2000);
+        // 1. Tạo request body
+        VerifyOtpRequest request = new VerifyOtpRequest(userEmail, otp);
+
+        // 2. Gọi API xác thực OTP
+        ApiClient.getApiService(requireContext()).verifyOtp(request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                showLoading(false);
+                if (response.isSuccessful()) {
+                    // XÁC THỰC THÀNH CÔNG
+                    Toast.makeText(getContext(), "Xác thực thành công!", Toast.LENGTH_SHORT).show();
+
+                    // TODO: Quyết định luồng đi tiếp theo
+                    // Nếu đến từ Register -> Chuyển đến RegisterSuccess
+                    // Nếu đến từ ForgotPassword -> Chuyển đến ResetPassword
+                    // Tạm thời mặc định là luồng đăng ký
+                    NavHostFragment.findNavController(OtpFragment.this)
+                            .navigate(R.id.action_otpFragment_to_registerSuccessFragment);
+                } else {
+                    // XÁC THỰC THẤT BẠI (sai OTP)
+                    showErrorDialog("Thất bại", "Mã OTP không chính xác hoặc đã hết hạn.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                showLoading(false);
+                Log.e("OtpFragment", "Verify OTP Failed: " + t.getMessage());
+                showErrorDialog("Lỗi mạng", "Không thể kết nối đến máy chủ.");
+            }
+        });
     }
 
     private void handleResendOtp() {
-        // Vô hiệu hóa nút để tránh spam click
-        binding.resendOtpTextView.setEnabled(false);
+        binding.resendOtpTextView.setEnabled(false); // Vô hiệu hóa nút
 
-        // *** GIẢ LẬP GỌI API GỬI LẠI MÃ ***
-        // Toast.makeText(getContext(), "Đã gửi lại mã.", Toast.LENGTH_SHORT).show();
+        // 1. Tạo request body
+        ResendOtpRequest request = new ResendOtpRequest(userEmail);
 
-        // Bắt đầu lại bộ đếm ngược
-        startCountdown();
+        // 2. Gọi API gửi lại OTP
+        ApiClient.getApiService(requireContext()).resendOtp(request).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Đã gửi lại mã OTP.", Toast.LENGTH_SHORT).show();
+                    startCountdown(); // Bắt đầu lại bộ đếm ngược
+                } else {
+                    Toast.makeText(getContext(), "Gửi lại mã thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
+                    binding.resendOtpTextView.setEnabled(true); // Cho phép nhấn lại
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                Log.e("OtpFragment", "Resend OTP Failed: " + t.getMessage());
+                Toast.makeText(getContext(), "Lỗi mạng. Không thể gửi lại mã.", Toast.LENGTH_SHORT).show();
+                binding.resendOtpTextView.setEnabled(true);
+            }
+        });
     }
 
     private void startCountdown() {
