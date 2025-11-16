@@ -172,7 +172,7 @@ public interface ApiService {
         public OtpRequest(String email, String otp) { this.email = email; this.otp = otp; }
     }
 
-    @POST("api/auth/verify-otp") // Giả định endpoint
+    @POST("api/auth/verify-email") // Giả định endpoint
     Call<Void> verifyOtp(@Body VerifyOtpRequest request);
 
     /**
