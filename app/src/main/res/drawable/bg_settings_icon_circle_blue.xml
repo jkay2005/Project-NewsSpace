@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- Dòng này định nghĩa màu nền cho hình tròn.
+         @color/primary sẽ tham chiếu đến màu chính trong file colors.xml của bạn -->
+    <solid android:color="@color/primary_blue" />
+
+</shape>

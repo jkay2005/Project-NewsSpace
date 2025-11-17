@@ -1,64 +1,126 @@
 package course.examples.newsspace;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+
+import com.bumptech.glide.Glide;
+
+import course.examples.newsspace.databinding.FragmentSettingsBinding;
+import course.examples.newsspace.databinding.ItemSettingBinding;
+import course.examples.newsspace.model.User;
+import course.examples.newsspace.utils.SessionManager;
+
 public class SettingsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FragmentSettingsBinding binding;
+    private SessionManager sessionManager;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public SettingsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SettingsFragment newInstance(String param1, String param2) {
-        SettingsFragment fragment = new SettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentSettingsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        sessionManager = new SessionManager(requireContext());
+        loadUserProfile();
+        setupSettingItems();
+        setupLogoutButton();
+    }
+
+    private void loadUserProfile() {
+        User currentUser = sessionManager.getUser();
+        if (currentUser != null) {
+            binding.usernameTextView.setText(currentUser.getName());
+            binding.emailTextView.setText(currentUser.getEmail());
+
+            // LỖI 1 ĐÃ SỬA:
+            // Tạm thời vô hiệu hóa việc tải ảnh từ URL vì model User chưa có getAvatarUrl().
+            Glide.with(this)
+                    .load((String) null) // Truyền vào null để Glide bỏ qua việc tải ảnh
+                    .placeholder(R.drawable.ic_avatar_placeholder)
+                    .error(R.drawable.ic_avatar_placeholder)
+                    .circleCrop()
+                    .into(binding.userAvatarImageView);
         }
     }
 
+    private void setupSettingItems() {
+        // LỖI 2 ĐÃ SỬA (TẠM THỜI):
+        // TODO: Thay lại bằng các icon đúng sau khi đã import từ Figma.
+        configureSettingItem(binding.generalSettingsLayout, R.drawable.ic_settings_general,
+                "Cài đặt chung", "Thay đổi các tùy chỉnh cơ bản", true, v -> showToast("Chức năng Cài đặt chung"));
+
+        configureSettingItem(binding.notificationSettingsLayout, R.drawable.ic_settings_notification,
+                "Thông báo", "Tùy chỉnh liên quan đến thông báo", true, v -> showToast("Chức năng Thông báo"));
+
+        configureSettingItem(binding.versionLayout, R.drawable.ic_settings_version,
+                "Phiên bản", "v1.1", false, null);
+
+        configureSettingItem(binding.termsLayout, R.drawable.ic_settings_terms,
+                "Điều khoản sử dụng", null, true, v -> showToast("Chức năng Điều khoản sử dụng"));
+
+        configureSettingItem(binding.policyLayout, R.drawable.ic_settings_policy,
+                "Chính sách bảo mật", null, true, v -> showToast("Chức năng Chính sách bảo mật"));
+    }
+
+    private void setupLogoutButton() {
+        binding.logoutLayout.setOnClickListener(v -> showLogoutConfirmationDialog());
+    }
+
+    private void showLogoutConfirmationDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận đăng xuất")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất không?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> performLogout())
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void performLogout() {
+        sessionManager.clearSession();
+        Intent intent = new Intent(requireActivity(), SplashActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
+    }
+
+    private void configureSettingItem(ItemSettingBinding itemBinding, int iconResId, String title, @Nullable String subtitle, boolean showChevron, @Nullable View.OnClickListener listener) {
+        itemBinding.settingIcon.setImageResource(iconResId);
+        itemBinding.settingTitle.setText(title);
+
+        if (subtitle != null && !subtitle.isEmpty()) {
+            itemBinding.settingSubtitle.setVisibility(View.VISIBLE);
+            itemBinding.settingSubtitle.setText(subtitle);
+        } else {
+            itemBinding.settingSubtitle.setVisibility(View.GONE);
+        }
+
+        itemBinding.settingChevron.setVisibility(showChevron ? View.VISIBLE : View.GONE);
+
+        if (listener != null) {
+            itemBinding.getRoot().setOnClickListener(listener);
+        }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
