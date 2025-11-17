@@ -1,41 +1,33 @@
-package course.examples.newsspace;
+package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link RegisterFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-
-// Import các thư viện cần thiết
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
-import course.examples.newsspace.databinding.FragmentRegisterBinding; // Thay bằng package của bạn
+
+// Import các lớp cần thiết cho việc gọi API
+import course.examples.newsspace.databinding.FragmentRegisterBinding;
+import course.examples.newsspace.model.RegisterRequest;
+import course.examples.newsspace.model.User;
+import course.examples.newsspace.api.ApiClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RegisterFragment extends Fragment {
 
-    // 1. Khai báo ViewBinding
     private FragmentRegisterBinding binding;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // 2. Khởi tạo ViewBinding
         binding = FragmentRegisterBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -44,74 +36,89 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 3. Gán sự kiện cho các View
-        binding.registerButton.setOnClickListener(v -> handleRegister());
+        setupClickListeners();
+    }
 
-        binding.loginTextView.setOnClickListener(v -> {
-            // Quay lại màn hình trước đó (LoginFragment) trong backstack
-            NavHostFragment.findNavController(RegisterFragment.this).navigateUp();
-        });
+    private void setupClickListeners() {
+        binding.registerButton.setOnClickListener(v -> handleRegister());
+        binding.loginTextView.setOnClickListener(v -> NavHostFragment.findNavController(RegisterFragment.this).navigateUp());
     }
 
     private void handleRegister() {
         // Lấy dữ liệu từ các EditText
         String email = binding.emailEditText.getText().toString().trim();
-        String username = binding.usernameEditText.getText().toString().trim();
+        String username = binding.usernameEditText.getText().toString().trim(); // API của bạn dùng "name"
         String password = binding.passwordEditText.getText().toString().trim();
         String confirmPassword = binding.confirmPasswordEditText.getText().toString().trim();
 
         // Kiểm tra tính hợp lệ của dữ liệu (Validation)
-        if (email.isEmpty() || username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            showErrorDialog("Lỗi", "Vui lòng điền đầy đủ thông tin.");
-            return; // Dừng lại nếu có lỗi
+        if (email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+            showErrorDialog("Thông tin không hợp lệ", "Vui lòng điền đầy đủ thông tin.");
+            return;
         }
 
         if (password.length() < 6) {
-            showErrorDialog("Lỗi", "Mật khẩu phải có ít nhất 6 ký tự.");
+            showErrorDialog("Mật khẩu không hợp lệ", "Mật khẩu phải có ít nhất 6 ký tự.");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            showErrorDialog("Lỗi", "Mật khẩu xác nhận không khớp.");
+            showErrorDialog("Mật khẩu không hợp lệ", "Mật khẩu xác nhận không khớp.");
             return;
         }
 
-        // Nếu tất cả dữ liệu hợp lệ, bắt đầu quá trình đăng ký
         showLoading(true);
 
-        // *** GIẢ LẬP GỌI API ĐĂNG KÝ ***
-        // Sử dụng Handler để mô phỏng độ trễ mạng là 2 giây.
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Sau khi có kết quả từ API
-            showLoading(false);
+        // 1. Tạo đối tượng Request Body
+        RegisterRequest registerRequest = new RegisterRequest(username, email, password);
 
-            // Giả sử đăng ký thành công, điều hướng sang màn hình OTP
-            // Bạn cần tạo action này trong file auth_nav_graph.xml
-            NavHostFragment.findNavController(RegisterFragment.this)
-                    .navigate(R.id.action_registerFragment_to_otpFragment);
+        // 2. Thực hiện gọi API đăng ký
+        ApiClient.getApiService(requireContext()).registerUser(registerRequest).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                showLoading(false);
 
-        }, 2000);
+                // 3. Xử lý phản hồi
+                if (response.isSuccessful() && response.body() != null) {
+                    // ĐĂNG KÝ THÀNH CÔNG (HTTP code 201)
+                    Toast.makeText(getContext(), "Đăng ký thành công! Vui lòng xác thực OTP.", Toast.LENGTH_LONG).show();
+
+                    // Chuyển sang màn hình OTP và truyền email theo
+                    // (Sử dụng Safe Args để truyền dữ liệu)
+                    RegisterFragmentDirections.ActionRegisterFragmentToOtpFragment action =
+                            RegisterFragmentDirections.actionRegisterFragmentToOtpFragment(email);
+                    NavHostFragment.findNavController(RegisterFragment.this).navigate(action);
+
+                } else {
+                    // ĐĂNG KÝ THẤT BẠI (HTTP code 4xx, 5xx)
+                    // Ví dụ: email đã tồn tại
+                    // TODO: Phân tích response.errorBody() để có thông báo lỗi chính xác hơn
+                    showErrorDialog("Đăng ký thất bại", "Email này có thể đã được sử dụng. Vui lòng thử lại.");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                // 4. XỬ LÝ LỖI MẠNG
+                showLoading(false);
+                Log.e("RegisterFragment", "API Call Failed: " + t.getMessage());
+                showErrorDialog("Lỗi kết nối", "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối internet.");
+            }
+        });
     }
 
-    // 4. Các hàm Helper (Tái sử dụng từ LoginFragment)
     private void showLoading(boolean isLoading) {
-        if (isLoading) {
-            binding.loadingProgressBar.setVisibility(View.VISIBLE);
-            binding.registerButton.setEnabled(false); // Vô hiệu hóa nút khi đang tải
-        } else {
-            binding.loadingProgressBar.setVisibility(View.GONE);
-            binding.registerButton.setEnabled(true);
-        }
+        binding.loadingProgressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        binding.registerButton.setEnabled(!isLoading);
+        binding.loginTextView.setEnabled(!isLoading);
     }
 
     private void showErrorDialog(String title, String message) {
-        // Cần kiểm tra isAdded() để đảm bảo Fragment đã được gắn vào Activity
-        // tránh lỗi "Fragment ... not attached to a context."
         if (isAdded()) {
             new AlertDialog.Builder(requireContext())
                     .setTitle(title)
                     .setMessage(message)
-                    .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
+                    .setPositiveButton("OK", null)
                     .show();
         }
     }
@@ -119,7 +126,6 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // 5. Dọn dẹp ViewBinding để tránh rò rỉ bộ nhớ
         binding = null;
     }
 }

@@ -16,7 +16,7 @@
         android:layout_height="40dp"
         android:layout_marginStart="16dp"
         android:contentDescription="Avatar người dùng"
-        android:src="@drawable/ic_avatar_placeholder"
+        android:src="@drawable/ic_avatar_placeholder1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

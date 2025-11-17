@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:clipToPadding="false"
+    android:paddingHorizontal="@dimen/spacing_medium">
+
+    <!-- SỬA 1: Thêm hiệu ứng nhấn cho ImageView -->
+    <ImageView
+        android:id="@+id/addCollectionImageView"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_add_circle"
+        app:backgroundTint="@null"
+        app:layout_anchor="@id/bottomAppBar"
+        app:maxImageSize="69dp"
+        app:tint="@null"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="thêm bookmark" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/bookmarkChipGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <!--
+                SỬA 2: Thêm layout_width và layout_height cho mỗi Chip.
+                Đây là nguyên nhân chính gây ra lỗi biên dịch.
+            -->
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="Đọc sau"
+                tools:checked="true"/>
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="Đã lưu"/>
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
+
+</LinearLayout>

@@ -29,4 +29,11 @@
 
     <!-- Khác -->
     <dimen name="section_header_line_width">4dp</dimen>
+    <!-- Kích thước mặc định của icon trong BottomNav là 24dp.
+         Chúng ta giảm nhẹ xuống còn 22dp hoặc 20dp. -->
+    <dimen name="bottom_nav_icon_size">22dp</dimen>
+
+    <!-- Kích thước mặc định của chữ là 12sp.
+         Chúng ta có thể giữ nguyên hoặc giảm nhẹ xuống 11sp nếu cần. -->
+    <dimen name="bottom_nav_text_size">12sp</dimen>
 </resources>
