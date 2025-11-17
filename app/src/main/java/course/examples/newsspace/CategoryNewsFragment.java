@@ -88,6 +88,10 @@ public class CategoryNewsFragment extends Fragment {
         ApiClient.getApiService(requireContext()).getRssItems().enqueue(new Callback<List<RssItem>>() {
             @Override
             public void onResponse(@NonNull Call<List<RssItem>> call, @NonNull Response<List<RssItem>> response) {
+                // Nếu view đã bị hủy trước khi có phản hồi, binding sẽ là null.
+                if (binding == null) {
+                    return;
+                }
                 // 2. Ẩn trạng thái loading sau khi có phản hồi
                 binding.progressBar.setVisibility(View.GONE);
                 binding.newsRecyclerView.setVisibility(View.VISIBLE);
@@ -147,6 +151,10 @@ public class CategoryNewsFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<List<RssItem>> call, @NonNull Throwable t) {
+                // Nếu view đã bị hủy trước khi có phản hồi, binding sẽ là null.
+                if (binding == null) {
+                    return;
+                }
                 // 6. Ẩn trạng thái loading và xử lý lỗi mạng
                 binding.progressBar.setVisibility(View.GONE);
                 Log.e("CategoryNewsFragment", "API Call Failed: " + t.getMessage());
