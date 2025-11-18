@@ -16,6 +16,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import course.examples.newsspace.utils.CredentialsManager;
+
 // Import các lớp cần thiết cho việc gọi API
 import course.examples.newsspace.databinding.FragmentLoginBinding;
 import course.examples.newsspace.model.LoginRequest;
@@ -30,6 +32,7 @@ public class LoginFragment extends Fragment {
 
     private FragmentLoginBinding binding;
     private SessionManager sessionManager; // Khai báo SessionManager
+    private CredentialsManager credentialsManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -41,11 +44,18 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Khởi tạo SessionManager
         sessionManager = new SessionManager(requireContext());
+        credentialsManager = new CredentialsManager(requireContext()); // Khởi tạo
+
+        // Tự động điền email nếu có
+        String savedEmail = credentialsManager.getEmail();
+        if (savedEmail != null) {
+            binding.emailEditText.setText(savedEmail);
+        }
 
         setupClickListeners();
     }
+
 
     private void setupClickListeners() {
         binding.loginButton.setOnClickListener(v -> handleLogin());
@@ -56,6 +66,7 @@ public class LoginFragment extends Fragment {
     private void handleLogin() {
         String email = binding.emailEditText.getText().toString().trim();
         String password = binding.passwordEditText.getText().toString().trim();
+        boolean rememberMe = binding.rememberMeCheckBox.isChecked(); // Lấy trạng thái checkbox
 
         if (email.isEmpty() || password.isEmpty()) {
             showValidationDialog("Thông tin không hợp lệ", "Vui lòng nhập đầy đủ email và mật khẩu.");
@@ -73,14 +84,20 @@ public class LoginFragment extends Fragment {
             public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                 showLoading(false);
 
-                // 3. Xử lý phản hồi từ server
                 if (response.isSuccessful() && response.body() != null) {
                     // ĐĂNG NHẬP THÀNH CÔNG
                     LoginResponse loginResponse = response.body();
 
-                    // Lưu token và thông tin người dùng
+                    // Lưu session token
                     sessionManager.saveAuthToken(loginResponse.getToken());
                     sessionManager.saveUser(loginResponse.getUser());
+
+                    // XỬ LÝ LƯU THÔNG TIN ĐĂNG NHẬP
+                    if (rememberMe) {
+                        credentialsManager.saveCredentials(email, password);
+                    } else {
+                        credentialsManager.clearCredentials();
+                    }
 
                     Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 

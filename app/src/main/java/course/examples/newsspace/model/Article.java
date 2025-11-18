@@ -29,6 +29,9 @@ public class Article {
     @SerializedName("createdAt")
     private String createdAt;
 
+    @SerializedName("url")
+    private static String url;
+
     // --- CÁC TRƯỜNG BỔ SUNG CHO GIAO DIỆN (KHÔNG CÓ TRONG JSON) ---
 
     private boolean isFeatured;
@@ -41,21 +44,23 @@ public class Article {
     // Constructor rỗng - Bắt buộc phải có để Gson hoạt động chính xác
     public Article() {}
 
-    public static Article createFeaturedArticle(String title, String description, String imageUrl) {
+    public static Article createFeaturedArticle(String title, String description, String imageUrl, String url) {
         Article article = new Article();
         article.title = title;
         article.description = description;
         article.imageUrl = imageUrl;
         article.isFeatured = true;
+        article.setUrl(Article.url);
         return article;
     }
 
-    public static Article createStandardArticle(String title, String date, String imageUrl) {
+    public static Article createStandardArticle(String title, String date, String imageUrl, String url) {
         Article article = new Article();
         article.title = title;
         article.date = date;
         article.imageUrl = imageUrl;
         article.isFeatured = false;
+        article.setUrl(Article.url);
         return article;
     }
 
@@ -84,6 +89,9 @@ public class Article {
     public String getCreatedAt() {
         return createdAt;
     }
+
+    public String getUrl() { return url; }
+    public void setUrl(String url) { this.url = url; }
 
     // --- CÁC GETTERS TÙY CHỈNH CHO GIAO DIỆN ---
 
@@ -129,4 +137,6 @@ public class Article {
      @SerializedName("category")
     private Category category;
     public Category getCategory() { return category; }
+
+
 }

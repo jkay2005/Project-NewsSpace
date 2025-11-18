@@ -1,5 +1,7 @@
 package course.examples.newsspace;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.material.chip.Chip;
 import java.util.ArrayList;
@@ -19,13 +22,16 @@ import java.util.stream.Collectors;
 
 import course.examples.newsspace.databinding.FragmentExploreBinding;
 import course.examples.newsspace.model.Article;
-import course.examples.newsspace.model.RssItem; // Dùng để hứng dữ liệu từ RecommendationResponse
-import course.examples.newsspace.model.UpdatePreferencesRequest;
-import course.examples.newsspace.model.RecommendationResponse;
-import course.examples.newsspace.api.ApiClient;
+import course.examples.newsspace.model.gnews.GNewsArticle;
+import course.examples.newsspace.model.gnews.GNewsResponse;
+import course.examples.newsspace.api.GNewsApiClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import course.examples.newsspace.model.RssItem; // Dùng để hứng dữ liệu từ RecommendationResponse
+import course.examples.newsspace.model.RecommendationResponse;
+import course.examples.newsspace.api.ApiClient;
 
 public class ExploreFragment extends Fragment {
 
@@ -47,13 +53,14 @@ public class ExploreFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d("FRAGMENT_LIFECYCLE", "ExploreFragment onViewCreated ĐÃ ĐƯỢC GỌI!");
         setupNewsRecyclerView();
         setupTopicChips();
         setupClickListeners();
 
-        // Ban đầu, tải và hiển thị tin tức gợi ý
-        loadRecommendedNews();
+
+        // THAY ĐỔI 2: Ban đầu, hiển thị màn hình chọn chuyên mục thay vì tải tin tức ngay
+        showCustomizeView();
     }
 
     private void setupClickListeners() {
@@ -62,7 +69,20 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupNewsRecyclerView() {
-        newsAdapter = new ArticleListAdapter(articleList);
+        ArticleListAdapter.OnArticleClickListener clickListener = article -> {
+            if (article.getUrl() != null && !article.getUrl().isEmpty()) {
+                // Sửa tên action và phương thức để khớp với ID trong nav_graph.xml
+                ExploreFragmentDirections.ActionNavExploreToArticleDetailFragment action =
+                        ExploreFragmentDirections.actionNavExploreToArticleDetailFragment(article.getUrl());
+
+                NavHostFragment.findNavController(ExploreFragment.this).navigate(action);
+            }  else {
+                Toast.makeText(getContext(), "Bài viết này không có đường dẫn.", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        // Khởi tạo adapter và truyền listener vào
+        newsAdapter = new ArticleListAdapter(articleList, clickListener);
         binding.newsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.newsRecyclerView.setAdapter(newsAdapter);
     }
@@ -94,43 +114,90 @@ public class ExploreFragment extends Fragment {
      * Lấy các chủ đề đã chọn và gửi lên server.
      */
     private void handleConfirmSelection() {
-        showLoading(true, "Đang cập nhật sở thích...");
-
         List<String> selectedTopics = getSelectedTopics();
-        UpdatePreferencesRequest request = new UpdatePreferencesRequest(selectedTopics);
 
-        ApiClient.getApiService(requireContext()).updatePreferences(request).enqueue(new Callback<UpdatePreferencesRequest>() {
-            @Override
-            public void onResponse(@NonNull Call<UpdatePreferencesRequest> call, @NonNull Response<UpdatePreferencesRequest> response) {
-                showLoading(false, null);
-                if (response.isSuccessful()) {
-                    // Cập nhật sở thích thành công, giờ tải lại tin tức
-                    showNewsView();
-                    loadRecommendedNews();
-                } else {
-                    Toast.makeText(getContext(), "Cập nhật sở thích thất bại", Toast.LENGTH_SHORT).show();
-                }
-            }
+        if (selectedTopics.isEmpty()) {
+            Toast.makeText(getContext(), "Vui lòng chọn ít nhất một chủ đề", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            @Override
-            public void onFailure(@NonNull Call<UpdatePreferencesRequest> call, @NonNull Throwable t) {
-                showLoading(false, null);
-                Log.e("ExploreFragment", "Update Prefs Failed: " + t.getMessage());
-                Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Tạo một chuỗi truy vấn để tìm kiếm tất cả các chủ đề
+        // Ví dụ: ["Kinh tế", "Thể thao"] -> "Kinh tế OR Thể thao"
+        String searchQuery = selectedTopics.stream()
+                .map(topic -> "\"" + topic + "\"") // Đặt trong ngoặc kép để tìm chính xác hơn
+                .collect(Collectors.joining(" OR "));
+
+        // Gọi hàm tải tin tức từ GNews với chuỗi truy vấn vừa tạo
+        loadNewsFromGNews(searchQuery);
+    }
+
+    /**
+     * THAY ĐỔI 4: Hàm mới để tải tin tức từ GNews dựa trên truy vấn tìm kiếm.
+     */
+    private void loadNewsFromGNews(String query) {
+        showLoading(true);
+        Log.d(TAG, "Đang tìm kiếm với truy vấn: " + query);
+
+        String apiKey = "ec4a35d60e28736506770fac7add6e82";
+
+        GNewsApiClient.getApiService()
+                .searchArticles(query, apiKey, "vi", "publishedAt")
+                .enqueue(new Callback<GNewsResponse>() {
+                    @Override
+                    public void onResponse(@NonNull Call<GNewsResponse> call, @NonNull Response<GNewsResponse> response) {
+                        showLoading(false);
+                        if (response.isSuccessful() && response.body() != null) {
+                            // Chuyển sang màn hình hiển thị tin tức
+                            showNewsView();
+
+                            List<GNewsArticle> gnewsArticles = response.body().getArticles();
+                            Log.d(TAG, "Tìm thấy " + gnewsArticles.size() + " bài báo cho truy vấn '" + query + "'");
+
+                            if (gnewsArticles.isEmpty()) {
+                                Toast.makeText(getContext(), "Không tìm thấy bài báo nào cho các chủ đề này.", Toast.LENGTH_LONG).show();
+                                // TODO: Hiển thị một TextView thông báo lỗi trên màn hình
+                                // binding.emptyViewTextView.setVisibility(View.VISIBLE);
+                                articleList.clear();
+                                newsAdapter.notifyDataSetChanged();
+                                return;
+                            }
+
+                            articleList.clear();
+                            for (GNewsArticle gnewsArticle : gnewsArticles) {
+                                articleList.add(Article.createStandardArticle(
+                                        gnewsArticle.getTitle(),
+                                        gnewsArticle.getPublishedAt(),
+                                        gnewsArticle.getImage(),
+                                        gnewsArticle.getUrl()
+                                ));
+                            }
+                            newsAdapter.notifyDataSetChanged();
+
+                        } else {
+                            Log.e(TAG, "Tìm kiếm thất bại. Mã lỗi: " + response.code());
+                            Toast.makeText(getContext(), "Không thể tải tin tức (Lỗi: " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Call<GNewsResponse> call, @NonNull Throwable t) {
+                        showLoading(false);
+                        Log.e(TAG, "Lỗi mạng khi tìm kiếm: " + t.getMessage());
+                        Toast.makeText(getContext(), "Lỗi kết nối mạng", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     /**
      * Tải danh sách tin tức được gợi ý từ API.
      */
     private void loadRecommendedNews() {
-        showLoading(true, "Đang tải tin cho bạn...");
+        showLoading(true);
 
         ApiClient.getApiService(requireContext()).getRecommendations().enqueue(new Callback<RecommendationResponse>() {
             @Override
             public void onResponse(@NonNull Call<RecommendationResponse> call, @NonNull Response<RecommendationResponse> response) {
-                showLoading(false, null);
+                showLoading(false);
                 if (response.isSuccessful() && response.body() != null) {
                     RecommendationResponse data = response.body();
 
@@ -144,8 +211,8 @@ public class ExploreFragment extends Fragment {
                             articleList.add(Article.createStandardArticle(
                                     item.getTitle(),
                                     item.getPublishedAt(),
-                                    item.getImageUrl()
-                            ));
+                                    item.getImageUrl(),
+                                    item.getUrl()));
                         }
                     }
                     newsAdapter.notifyDataSetChanged();
@@ -157,7 +224,7 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<RecommendationResponse> call, @NonNull Throwable t) {
-                showLoading(false, null);
+                showLoading(false);
                 Log.e("ExploreFragment", "Get Recommendations Failed: " + t.getMessage());
                 Toast.makeText(getContext(), "Lỗi mạng", Toast.LENGTH_SHORT).show();
             }
@@ -176,7 +243,7 @@ public class ExploreFragment extends Fragment {
     }
 
     // Hàm helper để quản lý trạng thái loading
-    private void showLoading(boolean isLoading, @Nullable String message) {
+    private void showLoading(boolean isLoading) {
         // TODO: Implement một giao diện loading tốt hơn
         if (isLoading) {
             // Hiển thị ProgressBar, có thể kèm theo text

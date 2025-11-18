@@ -1,4 +1,4 @@
-package course.examples.newsspace; // Thay bằng package của bạn
+package course.examples.newsspace;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -10,30 +10,34 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// Import các lớp cần thiết cho GNews
+import course.examples.newsspace.api.GNewsApiClient;
+import course.examples.newsspace.model.gnews.GNewsArticle;
+import course.examples.newsspace.model.gnews.GNewsResponse;
+
+// Import các lớp Model gốc của bạn
 import course.examples.newsspace.databinding.FragmentHomeBinding;
-import course.examples.newsspace.model.Article; // Giả định RssItem có thể được biểu diễn bằng Article
+import course.examples.newsspace.model.Article;
 import course.examples.newsspace.model.FooterData;
 import course.examples.newsspace.model.HeaderData;
-import course.examples.newsspace.model.RssItem;
-import course.examples.newsspace.model.RssSource;
 import course.examples.newsspace.model.SectionHeader;
 import course.examples.newsspace.model.TabData;
-import course.examples.newsspace.api.ApiClient;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
 public class HomeFragment extends Fragment {
-
     private FragmentHomeBinding binding;
     private HomeAdapter homeAdapter;
     private final List<Object> homeItems = new ArrayList<>();
+    private static final String TAG = "HomeFragment";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,360 +54,260 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Khởi tạo adapter với danh sách rỗng ban đầu
-        homeAdapter = new HomeAdapter(homeItems);
+        // 1. TẠO LISTENER
+        HomeAdapter.OnArticleClickListener clickListener = article -> {
+            if (article.getUrl() != null && !article.getUrl().isEmpty()) {
+                // Tạo action điều hướng bằng Safe Args
+                HomeFragmentDirections.ActionHomeFragmentToArticleDetailFragment action =
+                        HomeFragmentDirections.actionHomeFragmentToArticleDetailFragment(article.getUrl());
+
+                // Thực hiện điều hướng
+                NavHostFragment.findNavController(HomeFragment.this).navigate(action);
+            } else {
+                Toast.makeText(getContext(), "Bài viết này không có đường dẫn.", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        // 2. KHỞI TẠO ADAPTER VÀ TRUYỀN LISTENER
+        homeAdapter = new HomeAdapter(homeItems, clickListener);
         binding.homeRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.homeRecyclerView.setAdapter(homeAdapter);
     }
 
     private void loadHomePageData() {
         // TODO: Hiển thị trạng thái loading (ví dụ: Shimmer effect hoặc ProgressBar)
-
-        // Gọi API để lấy danh sách các tin tức từ RSS
-        ApiClient.getApiService(requireContext()).getRssItems().enqueue(new Callback<List<RssItem>>() {
+        String apiKey = "ec4a35d60e28736506770fac7add6e82";
+        Log.d(TAG, "Đang gọi GNews API với key: " + apiKey);
+        GNewsApiClient.getApiService().getTopHeadlines(apiKey, "vi", "vn").enqueue(new Callback<GNewsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<List<RssItem>> call, @NonNull Response<List<RssItem>> response) {
-                // TODO: Ẩn trạng thái loading
-
+            public void onResponse(@NonNull Call<GNewsResponse> call, @NonNull Response<GNewsResponse> response) {
+                // TODO: Ẩn loading
                 if (response.isSuccessful() && response.body() != null) {
-                    // LẤY DỮ LIỆU THÀNH CÔNG
-                    List<RssItem> rssItems = response.body();
+                    List<GNewsArticle> gnewsArticles = response.body().getArticles();
+                    Log.d(TAG, "API call thành công, nhận được " + gnewsArticles.size() + " bài báo.");
 
-                    // Xây dựng lại danh sách hiển thị
-                    buildDisplayList(rssItems);
+
+                    // Chuyển đổi từ GNewsArticle sang Article của bạn
+                    List<Article> displayArticles = new ArrayList<>();
+                    for (GNewsArticle gnewsArticle : gnewsArticles) {
+                        displayArticles.add(
+                                Article.createStandardArticle(
+                                        gnewsArticle.getTitle(),
+                                        gnewsArticle.getPublishedAt(),
+                                        gnewsArticle.getImage(), // Dùng getImage()
+                                        gnewsArticle.getUrl())
+                        );
+                    }
+
+                            // Gọi buildDisplayList với danh sách Article đã được chuyển đổi
+                            buildDisplayList(gnewsArticles);
 
                 } else {
+                    Log.e(TAG, "API call thất bại. Mã lỗi: " + response.code() + ", Thông báo: " + response.message());
                     Toast.makeText(getContext(), "Không thể tải dữ liệu trang chủ", Toast.LENGTH_SHORT).show();
                 }
             }
-
-            @Override
-            public void onFailure(@NonNull Call<List<RssItem>> call, @NonNull Throwable t) {
-                // TODO: Ẩn trạng thái loading
-                Log.e("HomeFragment", "API Call Failed: " + t.getMessage());
-                Toast.makeText(getContext(), "Lỗi mạng, không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
-            }
+                    @Override
+                    public void onFailure(@NonNull Call<GNewsResponse> call, @NonNull Throwable t) {
+                        // TODO: Ẩn trạng thái loading
+                        // binding.progressBar.setVisibility(View.GONE);
+                        Log.e(TAG, "API Call Failed on network: " + t.getMessage(), t);
+                        Toast.makeText(getContext(), "Lỗi mạng, không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
+                    }
         });
 
-//        // 1. Tạo một danh sách RssItem giả
-//        List<RssItem> fakeRssItems = new ArrayList<>();
-//
-//        // Tạo 3 tin nổi bật đầu tiên
-//        for (int i = 1; i <= 3; i++) {
-//            RssItem item = new RssItem();
-//            item.setId(i);
-//            item.setTitle("Tin nổi bật số " + i + ": Thế giới đối mặt với thách thức mới");
-//            item.setContent("Đây là một đoạn mô tả ngắn gọn nhưng đầy đủ thông tin về nội dung của bài báo nổi bật, thu hút sự chú ý của người đọc ngay từ cái nhìn đầu tiên.");
-//            item.setPublishedAt("11/12/2025");
-//            item.setAuthor("BTV Thời sự");
-//            item.setSource(new RssSource("VTV News", "thoisu")); // Gán chuyên mục "thoisu"
-//            fakeRssItems.add(item);
-//        }
-//
-//        // Tạo 5 tin cho chuyên mục "Thời sự"
-//        for (int i = 4; i <= 8; i++) {
-//            RssItem item = new RssItem();
-//            item.setId(i);
-//            item.setTitle("Tin thời sự " + (i - 3) + ": Cập nhật tình hình trong nước");
-//            item.setPublishedAt("11/12/2025");
-//            item.setSource(new RssSource("Báo Mới", "thoisu")); // Gán tag "thoisu"
-//            fakeRssItems.add(item);
-//        }
-//
-//        // Tạo 5 tin cho chuyên mục "Kinh tế"
-//        for (int i = 9; i <= 13; i++) {
-//            RssItem item = new RssItem();
-//            item.setId(i);
-//            item.setTitle("Bản tin kinh tế " + (i - 8) + ": Thị trường chứng khoán biến động");
-//            item.setPublishedAt("11/12/2025");
-//            item.setSource(new RssSource("CafeF", "kinhte")); // Gán tag "kinhte"
-//            fakeRssItems.add(item);
-//        }
-//
-//        // Tạo 5 tin cho chuyên mục "Công nghệ"
-//        for (int i = 14; i <= 18; i++) {
-//            RssItem item = new RssItem();
-//            item.setId(i);
-//            item.setTitle("Đánh giá sản phẩm công nghệ mới " + (i - 13));
-//            item.setPublishedAt("11/12/2025");
-//            item.setSource(new RssSource("Tinh Tế", "congnghe")); // Gán tag "congnghe"
-//            fakeRssItems.add(item);
-//        }
-//
-//        // 2. Gọi hàm buildDisplayList để xử lý và hiển thị dữ liệu giả này
-//        buildDisplayList(fakeRssItems);
     }
 
+
     /**
-     * Sắp xếp dữ liệu nhận từ API thành một danh sách duy nhất để Adapter hiển thị.
-     * @param rssItems Danh sách tin tức gốc từ API.
+     * THAY ĐỔI: Phương thức này giờ nhận `List<Article>` và xây dựng giao diện.
+     * Logic lọc theo tag đã được loại bỏ vì GNews không cung cấp thông tin đó.
+     * @param @gnewsArticles Danh sách tin tức đã được chuyển đổi từ GNews.
      */
-    private void buildDisplayList(List<RssItem> rssItems) {
+    private void buildDisplayList(List<GNewsArticle> gnewsArticles) {
         homeItems.clear(); // Luôn xóa dữ liệu cũ trước khi thêm mới
 
         // 1. Thêm các item tĩnh không thay đổi
         homeItems.add(new HeaderData());
         homeItems.add(new TabData());
 
+        if (gnewsArticles == null || gnewsArticles.isEmpty()) {
+            // Xử lý trường hợp không có bài báo nào
+            homeAdapter.notifyDataSetChanged();
+            return;
+        }
+
         // 2. Thêm tiêu đề cho mục "Tin nổi bật"
         homeItems.add(new SectionHeader("Tin nổi bật"));
 
+
         // Lấy 3 tin đầu tiên làm tin nổi bật (featured)
-        int featuredCount = 0;
-        for (RssItem item : rssItems) {
-            if (featuredCount < 3) {
-                // Sử dụng phương thức tĩnh để tạo một Article nổi bật
-                homeItems.add(Article.createFeaturedArticle(
-                        item.getTitle(),
-                        item.getContent(), // Giả định content là description ngắn
-                        item.getImageUrl()
-                ));
-                featuredCount++;
-            } else {
-                break; // Dừng lại khi đã đủ 3 tin
-            }
+        int featuredCount = Math.min(gnewsArticles.size(), 3);
+        for (int i = 0; i < featuredCount; i++) {
+            GNewsArticle item = gnewsArticles.get(i);
+            // Dùng lại model Article của bạn. Giả sử bạn có thể tạo featured article từ standard article.
+            // Nếu không, bạn có thể cần thêm thông tin description.
+            homeItems.add(Article.createFeaturedArticle(
+                    item.getTitle(),
+                    item.getDescription(),
+                    item.getImage(),
+                    item.getUrl()
+            ));
         }
 
         // 3. Thêm các mục tin tức theo từng chuyên mục
 
         // ----- MỤC MỚI NHẤT-----
         homeItems.add(new SectionHeader("Mới Nhất"));
-        int moiNhatCount = 0;
-        for (RssItem item : rssItems) {
-            if (moiNhatCount < 5 && item.getSource() != null && "moinhat".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                moiNhatCount++;
+        int remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC THỜI SỰ -----
         homeItems.add(new SectionHeader("Thời sự"));
-        int thoiSuCount = 0;
-        for (RssItem item : rssItems) {
-            // Lọc các tin thuộc "Thời sự" và chỉ lấy tối đa 5 tin
-            if (thoiSuCount < 5 && item.getSource() != null && "thoisu".equalsIgnoreCase(item.getSource().getTag())) {
-                // Sử dụng phương thức tĩnh để tạo một Article tiêu chuẩn
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                thoiSuCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC KINH TẾ -----
         homeItems.add(new SectionHeader("Kinh tế"));
-        int kinhTeCount = 0;
-        for (RssItem item : rssItems) {
-            if (kinhTeCount < 5 && item.getSource() != null && "kinhte".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                kinhTeCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
 
         // ----- MỤC chính trị -----
         homeItems.add(new SectionHeader("Chính trị"));
-        int chinhTriCount = 0;
-        for (RssItem item : rssItems) {
-            if (chinhTriCount < 5 && item.getSource() != null && "chinhtri".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                chinhTriCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC thế giới-----
         homeItems.add(new SectionHeader("Thế giới"));
-        int theGioiCount = 0;
-        for (RssItem item : rssItems) {
-            if (theGioiCount < 5 && item.getSource() != null && "thegioi".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                theGioiCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC Đời sống -----
         homeItems.add(new SectionHeader("Đời sống"));
-        int doiSongCount = 0;
-        for (RssItem item : rssItems) {
-            if (doiSongCount < 5 && item.getSource() != null && "doisong".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                doiSongCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC Du lịch -----
         homeItems.add(new SectionHeader("Du lịch"));
-        int duLichCount = 0;
-        for (RssItem item : rssItems) {
-            if (duLichCount < 5 && item.getSource() != null && "dulich".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                duLichCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC văn hóa -----
         homeItems.add(new SectionHeader("Văn hóa"));
-        int vanHoaCount = 0;
-        for (RssItem item : rssItems) {
-            if (vanHoaCount < 5 && item.getSource() != null && "vanhoa".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                vanHoaCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC giải trí -----
         homeItems.add(new SectionHeader("Giải trí"));
-        int giaiTriCount = 0;
-        for (RssItem item : rssItems) {
-            if (giaiTriCount < 5 && item.getSource() != null && "giaitri".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                giaiTriCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC giới trẻ -----
         homeItems.add(new SectionHeader("Giới trẻ"));
-        int gioiTreCount = 0;
-        for (RssItem item : rssItems) {
-            if (gioiTreCount < 5 && item.getSource() != null && "gioitre".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                gioiTreCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC giáo dục -----
         homeItems.add(new SectionHeader("Giáo dục"));
-        int giaoDucCount = 0;
-        for (RssItem item : rssItems) {
-            if (giaoDucCount < 5 && item.getSource() != null && "giaoduc".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                giaoDucCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC thể thao -----
         homeItems.add(new SectionHeader("Thể thao"));
-        int theThaoCount = 0;
-        for (RssItem item : rssItems) {
-            if (theThaoCount < 5 && item.getSource() != null && "thethao".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                theThaoCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC sức khỏe-----
         homeItems.add(new SectionHeader("Sức khỏe"));
-        int sucKhoeCount = 0;
-        for (RssItem item : rssItems) {
-            if (sucKhoeCount < 5 && item.getSource() != null && "suckhoe".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                sucKhoeCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC công nghệ -----
         homeItems.add(new SectionHeader("Công nghệ"));
-        int congNgheCount = 0;
-        for (RssItem item : rssItems) {
-            if (congNgheCount < 5 && item.getSource() != null && "congnghe".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                congNgheCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC thời trang -----
         homeItems.add(new SectionHeader("Thời trang"));
-        int thoiTrangCount = 0;
-        for (RssItem item : rssItems) {
-            if (thoiTrangCount < 5 && item.getSource() != null && "troitrang".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                thoiTrangCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC Xe -----
         homeItems.add(new SectionHeader("Xe"));
-        int xeCount = 0;
-        for (RssItem item : rssItems) {
-            if (xeCount < 5 && item.getSource() != null && "xe".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                xeCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 
         // ----- MỤC Tiêu dùng -----
         homeItems.add(new SectionHeader("Tiêu dùng"));
-        int tieuDungCount = 0;
-        for (RssItem item : rssItems) {
-            if (tieuDungCount < 5 && item.getSource() != null && "tieudung".equalsIgnoreCase(item.getSource().getTag())) {
-                homeItems.add(Article.createStandardArticle(
-                        item.getTitle(),
-                        item.getPublishedAt(),
-                        item.getImageUrl()
-                ));
-                tieuDungCount++;
+        remainingCount = Math.min(gnewsArticles.size(), 5); // Lấy tối đa 10 tin mới
+        if (gnewsArticles.size() > 3) {
+            for (int i = 3; i < remainingCount; i++) {
+                homeItems.add(gnewsArticles.get(i)); // Thêm trực tiếp đối tượng Article
             }
         }
 

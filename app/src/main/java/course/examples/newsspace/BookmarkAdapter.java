@@ -137,12 +137,12 @@ public class BookmarkAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     .into(binding.newsImageView);
 
             // Gán sự kiện click
-            itemView.setOnClickListener(v -> {
-                // Điều hướng sang ArticleDetailFragment
-                BookmarkFragmentDirections.ActionBookmarkFragmentToArticleDetailFragment action =
-                        BookmarkFragmentDirections.actionBookmarkFragmentToArticleDetailFragment(article.getId());
-                Navigation.findNavController(v).navigate(action);
-            });
+//            itemView.setOnClickListener(v -> {
+//                // Điều hướng sang ArticleDetailFragment
+//                BookmarkFragmentDirections.ActionBookmarkFragmentToArticleDetailFragment action =
+//                        BookmarkFragmentDirections.actionBookmarkFragmentToArticleDetailFragment(article.getId());
+//                Navigation.findNavController(v).navigate(action);
+//            });
         }
     }
 

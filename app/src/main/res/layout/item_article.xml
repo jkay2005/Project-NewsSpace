@@ -1,0 +1,59 @@
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp" android:layout_marginVertical="8dp" app:cardCornerRadius="12dp" app:cardElevation="4dp"><androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Ảnh đại diện của bài báo -->
+    <ImageView
+        android:id="@+id/articleImageView"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/backgrounds/scenic" />
+
+    <!-- Tiêu đề bài báo -->
+    <TextView
+        android:id="@+id/articleTitleTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/articleImageView"
+        tools:text="Đây là một tiêu đề bài báo mẫu rất dài để kiểm tra xem nó có hiển thị đúng 3 dòng hay không." />
+
+    <!-- Nguồn tin -->
+    <TextView
+        android:id="@+id/articleSourceTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:textAppearance="?attr/textAppearanceCaption"
+        android:textColor="?android:attr/textColorSecondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/articleTitleTextView"
+        app:layout_constraintTop_toBottomOf="@id/articleTitleTextView"
+        tools:text="VnExpress" />
+
+    <!-- Nút Bookmark (Tùy chọn) -->
+    <ImageView
+        android:id="@+id/bookmarkButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:src="@drawable/ic_bookmark_border"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Bookmark"
+        app:layout_constraintEnd_toEndOf="@id/articleTitleTextView"
+        app:layout_constraintTop_toTopOf="@id/articleSourceTextView"
+        app:layout_constraintBottom_toBottomOf="@id/articleSourceTextView"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout></com.google.android.material.card.MaterialCardView>

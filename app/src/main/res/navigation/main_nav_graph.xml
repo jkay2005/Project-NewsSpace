@@ -74,8 +74,8 @@
         android:name="course.examples.newsspace.ArticleDetailFragment"
         android:label="ArticleDetailFragment" >
         <argument
-            android:name="articleId"
-            app:argType="integer" />
+            android:name="ArticleUrl"
+            app:argType="string" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 </navigation>

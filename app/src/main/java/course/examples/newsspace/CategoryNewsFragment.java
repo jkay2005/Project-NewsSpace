@@ -1,8 +1,6 @@
 package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,22 +15,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import course.examples.newsspace.api.ApiClient;
 import course.examples.newsspace.databinding.FragmentCategoryNewsBinding;
 import course.examples.newsspace.model.Article;
-import course.examples.newsspace.model.RssItem;
-import course.examples.newsspace.model.RssSource;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import course.examples.newsspace.api.GNewsApiClient;
+import course.examples.newsspace.model.gnews.GNewsArticle;
+ import course.examples.newsspace.model.gnews.GNewsResponse;
 
 public class CategoryNewsFragment extends Fragment {
 
     private FragmentCategoryNewsBinding binding;
     private ArticleListAdapter adapter;
     private final List<Article> articleList = new ArrayList<>();
+    private static final String TAG = "CategoryNewsFragment";
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,183 +43,110 @@ public class CategoryNewsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // == "MỞ QUÀ": LẤY DỮ LIỆU TỪ ARGUMENTS BẰNG SAFE ARGS   ==
-        // ==========================================================
-        String categoryName = "Mới nhất"; // Giá trị mặc định
+        String categoryName = "Mới nhất";
         if (getArguments() != null) {
-            // Lấy tên chuyên mục đã được HomeAdapter gửi qua
             categoryName = CategoryNewsFragmentArgs.fromBundle(getArguments()).getCategoryName();
         }
 
-        // ==========================================================
-        // == SỬ DỤNG "MÓn QUÀ"                                  ==
-        // ==========================================================
-        // 1. Đặt tên chuyên mục làm tiêu đề cho Toolbar
         setupToolbar(categoryName);
-
-        setupRecyclerView();
-
-        // 2. Dùng tên chuyên mục để lọc dữ liệu từ API
+        setupRecyclerView(); // <-- CHÚNG TA SẼ SỬA PHƯƠNG THỨC NÀY
         loadNewsData(categoryName);
     }
 
     private void setupToolbar(String title) {
-        // Hàm này bây giờ sẽ nhận tiêu đề một cách linh hoạt
         binding.toolbar.setTitle(title);
         binding.toolbar.setNavigationOnClickListener(v -> NavHostFragment.findNavController(this).navigateUp());
     }
 
-
+    // ===================================================================================
+// == PHẦN CẬP NHẬT CHÍNH NẰM Ở ĐÂY
+// ===================================================================================
     private void setupRecyclerView() {
-        adapter = new ArticleListAdapter(articleList);
+        // 1. TẠO RA MỘT LISTENER ĐỂ XỬ LÝ SỰ KIỆN CLICK
+        ArticleListAdapter.OnArticleClickListener clickListener = article -> {
+            if (article.getUrl() != null && !article.getUrl().isEmpty()) {
+                // Tạo action điều hướng bằng Safe Args, khớp với ID trong nav_graph.xml
+                CategoryNewsFragmentDirections.ActionCategoryNewsFragmentToArticleDetailFragment action =
+                        CategoryNewsFragmentDirections.actionCategoryNewsFragmentToArticleDetailFragment(article.getUrl());
+
+                // Thực hiện điều hướng
+                NavHostFragment.findNavController(CategoryNewsFragment.this).navigate(action);
+            } else {
+                Toast.makeText(getContext(), "Bài viết này không có đường dẫn.", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        // 2. KHỞI TẠO ADAPTER VÀ TRUYỀN LISTENER VÀO
+        adapter = new ArticleListAdapter(articleList, clickListener);
         binding.newsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.newsRecyclerView.setAdapter(adapter);
     }
 
-    // Trong file CategoryNewsFragment.java
-
+    // Phương thức loadNewsData giữ nguyên như cũ...
     private void loadNewsData(String categoryNameToFilter) {
-        // 1. Hiển thị trạng thái loading để người dùng biết ứng dụng đang làm việc
-        // TODO: Thay thế ProgressBar bằng một hiệu ứng Shimmer đẹp hơn nếu có thời gian
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.newsRecyclerView.setVisibility(View.GONE);
+        Log.d(TAG, "Đang tìm kiếm tin tức cho chuyên mục: " + categoryNameToFilter);
 
-        ApiClient.getApiService(requireContext()).getRssItems().enqueue(new Callback<List<RssItem>>() {
+        String apiKey = "ec4a35d60e28736506770fac7add6e82";
+
+        Call<GNewsResponse> apiCall;
+        if ("Mới nhất".equalsIgnoreCase(categoryNameToFilter)) {
+            apiCall = GNewsApiClient.getApiService().getTopHeadlines(apiKey, "vi", "vn");
+        } else {
+            apiCall = GNewsApiClient.getApiService().searchArticles(categoryNameToFilter, apiKey, "vi", "publishedAt");
+        }
+
+        apiCall.enqueue(new Callback<GNewsResponse>() {
             @Override
-            public void onResponse(@NonNull Call<List<RssItem>> call, @NonNull Response<List<RssItem>> response) {
-                // 2. Ẩn trạng thái loading sau khi có phản hồi
+            public void onResponse(@NonNull Call<GNewsResponse> call, @NonNull Response<GNewsResponse> response) {
                 binding.progressBar.setVisibility(View.GONE);
                 binding.newsRecyclerView.setVisibility(View.VISIBLE);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    List<RssItem> allItems = response.body();
+                    List<GNewsArticle> gnewsArticles = response.body().getArticles();
+                    Log.d(TAG, "Tìm thấy " + gnewsArticles.size() + " bài báo cho '" + categoryNameToFilter + "'");
 
-                    // 3. Lọc danh sách theo chuyên mục đã nhận được
-                    List<RssItem> filteredItems;
-
-                    // Trường hợp đặc biệt: Nếu là "Mới nhất", hiển thị tất cả
-                    if ("Mới nhất".equalsIgnoreCase(categoryNameToFilter)) {
-                        filteredItems = allItems;
-                    } else {
-                        // Lọc theo tag của chuyên mục
-                        filteredItems = allItems.stream()
-                                .filter(item -> item.getSource() != null && categoryNameToFilter.equalsIgnoreCase(item.getSource().getTag()))
-                                .collect(Collectors.toList());
-                    }
-
-                    // 4. Xóa dữ liệu cũ và chuyển đổi dữ liệu mới để Adapter hiển thị
                     articleList.clear();
 
-                    if (filteredItems.isEmpty()) {
-                        // TODO: Hiển thị một giao diện "Không có tin tức" cho người dùng
+                    if (gnewsArticles.isEmpty()) {
                         Toast.makeText(getContext(), "Không có tin tức nào cho chuyên mục này", Toast.LENGTH_SHORT).show();
                     } else {
-                        for (int i = 0; i < filteredItems.size(); i++) {
-                            RssItem item = filteredItems.get(i);
-                            // Đánh dấu 2 tin đầu tiên là tin nổi bật (featured) để dùng layout lớn
+                        for (int i = 0; i < gnewsArticles.size(); i++) {
+                            GNewsArticle gnewsArticle = gnewsArticles.get(i);
                             boolean isFeatured = i < 2;
 
                             if (isFeatured) {
-                                // Dùng phương thức tĩnh của Article để tạo
                                 articleList.add(Article.createFeaturedArticle(
-                                        item.getTitle(),
-                                        item.getContent(), // Giả định content là description
-                                        item.getImageUrl()
-                                ));
+                                        gnewsArticle.getTitle(),
+                                        gnewsArticle.getDescription(),
+                                        gnewsArticle.getImage(),
+                                        gnewsArticle.getUrl()));
                             } else {
                                 articleList.add(Article.createStandardArticle(
-                                        item.getTitle(),
-                                        item.getPublishedAt(),
-                                        item.getImageUrl()
-                                ));
+                                        gnewsArticle.getTitle(),
+                                        gnewsArticle.getPublishedAt(),
+                                        gnewsArticle.getImage(),
+                                        gnewsArticle.getUrl()));
                             }
                         }
                     }
-
-                    // 5. Thông báo cho Adapter rằng dữ liệu đã thay đổi và cần vẽ lại
                     adapter.notifyDataSetChanged();
 
                 } else {
+                    Log.e(TAG, "API call thất bại. Mã lỗi: " + response.code());
                     Toast.makeText(getContext(), "Không thể tải tin tức. Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<RssItem>> call, @NonNull Throwable t) {
-                // 6. Ẩn trạng thái loading và xử lý lỗi mạng
+            public void onFailure(@NonNull Call<GNewsResponse> call, @NonNull Throwable t) {
                 binding.progressBar.setVisibility(View.GONE);
-                Log.e("CategoryNewsFragment", "API Call Failed: " + t.getMessage());
+                Log.e(TAG, "Lỗi mạng: " + t.getMessage());
                 Toast.makeText(getContext(), "Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.", Toast.LENGTH_SHORT).show();
             }
         });
-
-        // == THÊM PHẦN TẠO DỮ LIỆU GIẢ (DUMMY DATA) ĐỂ TEST     ==
-        // ==========================================================
-        // Dùng Handler để giả lập độ trễ mạng, tạo cảm giác thật hơn
-//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-//            // 2. Ẩn trạng thái loading sau khi "tải" xong dữ liệu giả
-//            binding.progressBar.setVisibility(View.GONE);
-//            binding.newsRecyclerView.setVisibility(View.VISIBLE);
-//
-//            // 3. Tạo một danh sách RssItem giả đầy đủ
-//            List<RssItem> allFakeItems = createAllFakeRssItems();
-//
-//            // 4. Lọc danh sách giả theo chuyên mục đã nhận được
-//            List<RssItem> filteredFakeItems;
-//            if ("Mới nhất".equalsIgnoreCase(categoryNameToFilter)) {
-//                filteredFakeItems = allFakeItems;
-//            } else {
-//                filteredFakeItems = allFakeItems.stream()
-//                        .filter(item -> item.getSource() != null && categoryNameToFilter.equalsIgnoreCase(item.getSource().getTag()))
-//                        .collect(Collectors.toList());
-//            }
-//
-//            // 5. Xóa dữ liệu cũ và chuyển đổi dữ liệu mới để Adapter hiển thị
-//            articleList.clear();
-//            if (filteredFakeItems.isEmpty()) {
-//                Toast.makeText(getContext(), "Không có tin tức nào cho chuyên mục này (dữ liệu giả)", Toast.LENGTH_SHORT).show();
-//            } else {
-//                for (int i = 0; i < filteredFakeItems.size(); i++) {
-//                    RssItem item = filteredFakeItems.get(i);
-//                    boolean isFeatured = i < 2;
-//                    if (isFeatured) {
-//                        articleList.add(Article.createFeaturedArticle(item.getTitle(), item.getContent(), item.getImageUrl()));
-//                    } else {
-//                        articleList.add(Article.createStandardArticle(item.getTitle(), item.getPublishedAt(), item.getImageUrl()));
-//                    }
-//                }
-//            }
-//
-//            // 6. Thông báo cho Adapter rằng dữ liệu đã thay đổi
-//            adapter.notifyDataSetChanged();
-//
-//        }, 1000); // Giả lập chờ 1 giây
     }
-
-    /**
-     * Hàm helper để tạo ra một danh sách đầy đủ các tin tức giả cho tất cả các chuyên mục.
-     * Tách ra hàm riêng để giữ cho loadNewsData() gọn gàng.
-     * @return Danh sách các RssItem giả.
-     */
-//    private List<RssItem> createAllFakeRssItems() {
-//        List<RssItem> fakeItems = new ArrayList<>();
-//        String[] categories = {"Thời sự", "Kinh tế", "Công nghệ", "Thế giới"}; // Các chuyên mục có dữ liệu giả
-//
-//        int idCounter = 1;
-//        for (String category : categories) {
-//            // Tạo 7 tin cho mỗi chuyên mục
-//            for (int i = 1; i <= 7; i++) {
-//                RssItem item = new RssItem();
-//                item.setId(idCounter++);
-//                item.setTitle("Tin " + category + " số " + i + ": Tiêu đề bài viết mẫu");
-//                item.setContent("Đây là nội dung mô tả ngắn cho bài báo thuộc chuyên mục " + category + ".");
-//                item.setPublishedAt("11/12/2025");
-//                item.setSource(new RssSource("Báo Giả Lập", category.toLowerCase())); // Gán tag là tên chuyên mục viết thường
-//                fakeItems.add(item);
-//            }
-//        }
-//        return fakeItems;
-//    }
 
     @Override
     public void onDestroyView() {

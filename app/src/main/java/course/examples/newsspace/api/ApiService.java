@@ -10,6 +10,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import course.examples.newsspace.model.BookmarkRequest;
 
 // Import tất cả các lớp Model, Request, Response cần thiết
 import course.examples.newsspace.model.*; // Giả sử tất cả model nằm trong package này
@@ -183,5 +184,8 @@ public interface ApiService {
 
     @POST("auth/logout") // Hoặc đường dẫn API logout của bạn
     Call<Void> logoutUser(); // Không cần body trả về nên dùng Void
+
+    @POST("bookmarks") // Thay "bookmarks" bằng endpoint thực tế của bạn
+    Call<Void> addBookmark(@Body BookmarkRequest request);
 
 }

@@ -18,6 +18,7 @@ import course.examples.newsspace.databinding.FragmentSettingsBinding;
 import course.examples.newsspace.databinding.ItemSettingBinding;
 import course.examples.newsspace.model.User;
 import course.examples.newsspace.utils.SessionManager;
+import course.examples.newsspace.utils.CredentialsManager;
 
 public class SettingsFragment extends Fragment {
 
@@ -90,6 +91,8 @@ public class SettingsFragment extends Fragment {
 
     private void performLogout() {
         sessionManager.clearSession();
+        // THÊM DÒNG NÀY: Xóa thông tin đăng nhập đã lưu
+        new CredentialsManager(requireContext()).clearCredentials();
         Intent intent = new Intent(requireActivity(), SplashActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

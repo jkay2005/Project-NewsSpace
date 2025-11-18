@@ -11,19 +11,26 @@ import java.util.List;
 
 import course.examples.newsspace.databinding.ItemFeaturedNewsCardBinding;
 import course.examples.newsspace.databinding.ItemStandardNewsCardBinding;
+import course.examples.newsspace.db.AppDatabase;
 import course.examples.newsspace.model.Article;
 
 public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
+    public interface OnArticleClickListener {
+        void onArticleClick(Article article);
+    }
     private static final int VIEW_TYPE_FEATURED = 1;
     private static final int VIEW_TYPE_STANDARD = 2;
 
     private final List<Article> articles;
+    private final OnArticleClickListener clickListener;
 
-    public ArticleListAdapter(List<Article> articles) {
+    private AppDatabase database; // Thêm biến database
+
+
+    public ArticleListAdapter(List<Article> articles, OnArticleClickListener clickListener) {
         this.articles = articles;
+        this.clickListener = clickListener;
     }
-
     @Override
     public int getItemViewType(int position) {
         if (articles.get(position).isFeatured()) {
@@ -48,17 +55,15 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Article article = articles.get(position);
         if (holder.getItemViewType() == VIEW_TYPE_FEATURED) {
-            // Gọi phương thức bind của ViewHolder tương ứng
-            ((FeaturedNewsViewHolder) holder).bind(article);
+            ((FeaturedNewsViewHolder) holder).bind(article, clickListener);
         } else {
-            // Gọi phương thức bind của ViewHolder tương ứng
-            ((StandardNewsViewHolder) holder).bind(article);
+            ((StandardNewsViewHolder) holder).bind(article, clickListener);
         }
     }
 
     @Override
     public int getItemCount() {
-        return articles.size();
+        return articles != null ? articles.size() : 0;
     }
 
     // ===================================================================================
@@ -76,7 +81,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         /**
          * Phương thức riêng để gán dữ liệu và xử lý sự kiện cho ViewHolder này.
          */
-        void bind(Article article) {
+        void bind(final Article article, final OnArticleClickListener listener) {
             binding.newsTitleTextView.setText(article.getTitle());
             binding.newsDescriptionTextView.setText(article.getDescription());
             binding.dateTextView.setText(article.getDate());
@@ -89,13 +94,10 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             // Gán sự kiện click cho toàn bộ thẻ tin
             itemView.setOnClickListener(v -> {
-                // Tạo action để điều hướng từ CategoryNewsFragment sang ArticleDetailFragment
-                // và truyền vào ID của bài báo.
-                CategoryNewsFragmentDirections.ActionCategoryNewsFragmentToArticleDetailFragment action =
-                        CategoryNewsFragmentDirections.actionCategoryNewsFragmentToArticleDetailFragment(article.getId());
-
-                // Tìm NavController và thực hiện điều hướng
-                Navigation.findNavController(v).navigate(action);
+                // Thay vì tự điều hướng, nó sẽ gọi ra bên ngoài (Fragment) để xử lý
+                if (listener != null) {
+                    listener.onArticleClick(article);
+                }
             });
         }
     }
@@ -111,7 +113,7 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         /**
          * Phương thức riêng để gán dữ liệu và xử lý sự kiện cho ViewHolder này.
          */
-        void bind(Article article) {
+        void bind(final Article article, final OnArticleClickListener listener) {
             binding.newsTitleTextView.setText(article.getTitle());
             binding.dateTextView.setText(article.getDate());
 
@@ -123,14 +125,9 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
             // Gán sự kiện click cho toàn bộ thẻ tin
             itemView.setOnClickListener(v -> {
-                // Tạo một Bundle để chứa articleId
-                Bundle bundle = new Bundle();
-                bundle.putInt("articleId", article.getId());
-                // Tạo action để điều hướng từ CategoryNewsFragment
-                CategoryNewsFragmentDirections.ActionCategoryNewsFragmentToArticleDetailFragment action =
-                        CategoryNewsFragmentDirections.actionCategoryNewsFragmentToArticleDetailFragment(article.getId());
-
-                Navigation.findNavController(v).navigate(action);
+                if (listener != null) {
+                    listener.onArticleClick(article);
+                }
             });
         }
     }
