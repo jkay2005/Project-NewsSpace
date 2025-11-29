@@ -3,4 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="desc_add_new_collection">Thêm bộ sưu tập mới</string>
+    <!-- Mô tả cho các nút trong màn hình tạo bài viết -->
+    <string name="desc_open_editing_tools">Mở công cụ chỉnh sửa</string>
+    <string name="desc_insert_image">Thêm ảnh từ thư viện</string>
+    <string name="desc_format_alignment">Căn lề văn bản</string>
+    <string name="desc_format_style">Định dạng kiểu chữ</string>
 </resources>

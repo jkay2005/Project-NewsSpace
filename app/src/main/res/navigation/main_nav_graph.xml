@@ -24,6 +24,12 @@
         <action
             android:id="@+id/action_nav_home_to_nav_bookmark"
             app:destination="@id/nav_bookmark" />
+        <action
+            android:id="@+id/action_home_to_notification"
+            app:destination="@id/notificationFragment" />
+        <action
+            android:id="@+id/action_home_to_search"
+            app:destination="@id/searchFragment" />
     </fragment>
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
 
@@ -56,7 +62,14 @@
         android:id="@+id/nav_settings"
         android:name="course.examples.newsspace.SettingsFragment"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_generalSettingsFragment"
+            app:destination="@id/generalSettingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_notificationSettingsFragment"
+            app:destination="@id/notificationSettingsFragment" />
+    </fragment>
     <fragment
         android:id="@+id/categoryNewsFragment"
         android:name="course.examples.newsspace.CategoryNewsFragment"
@@ -77,5 +90,77 @@
             android:name="articleId"
             app:argType="integer" />
     </fragment>
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="course.examples.newsspace.NotificationFragment"
+        android:label="fragment_notification"
+        tools:layout="@layout/fragment_notification" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="course.examples.newsspace.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" />
+    <fragment
+        android:id="@+id/generalSettingsFragment"
+        android:name="course.examples.newsspace.GeneralSettingsFragment"
+        android:label="GeneralSettingsFragment"
+        tools:layout="@layout/fragment_general_settings">
+        <action
+            android:id="@+id/action_generalSettingsFragment_to_editProfileFragment"
+            app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_generalSettingsFragment_to_userActivityFragment_myBlogs"
+            app:destination="@id/userActivityFragment" >
+            <argument android:name="activityType" android:defaultValue="MY_BLOGS" />
+            <argument android:name="screenTitle" android:defaultValue="Blog đã đăng" />
+        </action>
+        <action
+            android:id="@+id/action_generalSettingsFragment_to_userActivityFragment_savedNews"
+            app:destination="@id/userActivityFragment" >
+            <argument android:name="activityType" android:defaultValue="SAVED_NEWS" />
+            <argument android:name="screenTitle" android:defaultValue="Tin đã lưu" />
+        </action>
+        <action
+            android:id="@+id/action_generalSettingsFragment_to_userActivityFragment_history"
+            app:destination="@id/userActivityFragment" >
+            <argument android:name="activityType" android:defaultValue="HISTORY" />
+            <argument android:name="screenTitle" android:defaultValue="Tin đã xem" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationSettingsFragment"
+        android:name="course.examples.newsspace.NotificationSettingsFragment"
+        android:label="fragment_notification_settings"
+        tools:layout="@layout/fragment_notification_settings"
+
+        >
+        <action
+            android:id="@+id/action_notificationSettingsFragment_to_categoryNotificationSettingsFragment"
+            app:destination="@id/categoryNotificationSettingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/categoryNotificationSettingsFragment"
+        android:name="course.examples.newsspace.CategoryNotificationSettingsFragment"
+        android:label="fragment_category_notification_settings"
+        tools:layout="@layout/fragment_category_notification_settings" />
     <!-- ID này PHẢI TRÙNG với ID trong menu -->
+
+    <fragment
+        android:id="@+id/userActivityFragment"
+        android:name="course.examples.newsspace.UserActivityFragment"
+        android:label="fragment_user_activity"
+        tools:layout="@layout/fragment_user_activity" >
+        <argument
+            android:name="activityType"
+            app:argType="string" />
+        <argument
+            android:name="screenTitle"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="course.examples.newsspace.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
 </navigation>

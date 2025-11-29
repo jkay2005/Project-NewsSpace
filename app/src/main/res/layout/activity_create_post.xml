@@ -1,0 +1,96 @@
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"><LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Toolbar ở trên cùng -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bài viết mới"
+            android:textAppearance="@style/TextAppearance.App.ToolbarTitle"
+            android:layout_gravity="center"/>
+        <TextView
+            android:id="@+id/postButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng"
+            android:textColor="@color/primary_blue"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:layout_gravity="end"
+            android:layout_marginEnd="16dp"/>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- Vùng nội dung có thể cuộn -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contentRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp" />
+</LinearLayout>
+
+    <!-- Bộ công cụ FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_insert_photo"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        app:layout_anchor="@id/fabWrench"
+        app:layout_anchorGravity="top|center"
+        android:contentDescription="@string/desc_insert_image"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAlign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_format_align_center"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        app:layout_anchor="@id/fabImage"
+        app:layout_anchorGravity="top|center"
+        android:contentDescription="@string/desc_format_alignment"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_format_bold"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        app:layout_anchor="@id/fabAlign"
+        app:layout_anchorGravity="top|center"
+        android:contentDescription="@string/desc_format_style"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabWrench"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_wrench_tool"
+        app:backgroundTint="@color/grey_200"
+        android:contentDescription="@string/desc_open_editing_tools"
+        app:tint="@color/text_primary"/>
+
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

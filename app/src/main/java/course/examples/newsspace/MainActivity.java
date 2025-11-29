@@ -18,6 +18,7 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import course.examples.newsspace.databinding.ActivityMainBinding; // Thay bằng package của bạn
 
+import android.content.Intent;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -39,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
         // 3. Xử lý sự kiện click cho nút FAB (Floating Action Button) riêng
         binding.fab.setOnClickListener(view -> {
-            // Xử lý logic khi nhấn nút "+" ở đây
-            // Ví dụ: Toast.makeText(this, "Add button clicked!", Toast.LENGTH_SHORT).show();
+            // Tạo một Intent để khởi chạy CreatePostActivity
+            Intent intent = new Intent(MainActivity.this, CreatePostActivity.class);
+            startActivity(intent);
         });
     }
 }

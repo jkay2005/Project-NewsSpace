@@ -25,4 +25,14 @@
 
     <color name="grey_500">#9E9E9E</color>
 
+    <color name="notification_unread_background">#FFFFFF</color>
+
+    <!-- Màu nền cho item thông báo ĐÃ ĐỌC -->
+    <color name="notification_read_background">#F5F5F5</color>
+
+    <!-- Màu cho đường kẻ phân cách -->
+    <color name="divider_color">#E0E0E0</color>
+
+    <color name="unread_notification_bg">#F5F5F5</color>.
+
 </resources>

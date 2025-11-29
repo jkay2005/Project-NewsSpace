@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none"
+    tools:context=".UtilitiesFragment"><LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 1. Card Thời tiết -->
+    <!-- Sử dụng <include> để nhúng layout card_weather.xml vào đây -->
+    <!-- Đặt id cho include để có thể truy cập các View bên trong nó từ code -->
+    <include
+        android:id="@+id/weatherCard"
+        layout="@layout/card_weather" />
+
+    <!-- 2. Card Lịch thi đấu -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_rounded_card_grey"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header của Lịch thi đấu -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/leagueNameTextView"
+                style="@style/TextAppearance.App.NewsTitle.Large"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/primary_blue"
+                tools:text="Ngoại Hạng Anh" />
+
+            <TextView
+                android:id="@+id/roundTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bg_round_tag"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                tools:text="Vòng 8, ngày 18/10/2025" />
+        </RelativeLayout>
+
+        <!-- Danh sách các trận đấu -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/footballRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_football_match" />
+    </LinearLayout>
+
+</LinearLayout></ScrollView>

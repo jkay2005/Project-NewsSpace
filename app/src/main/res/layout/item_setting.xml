@@ -1,55 +1,75 @@
-<!-- File: res/layout/item_setting.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingVertical="12dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
-
+    android:focusable="true"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
     <ImageView
-        android:id="@+id/setting_icon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/bg_settings_icon_circle_blue"
-        android:padding="8dp"
-        app:tint="@android:color/white"
-        tools:src="@drawable/ic_settings_general"
-        android:contentDescription="Setting Icon"/>
+    android:id="@+id/setting_icon"
+    android:layout_width="36dp"
+    android:layout_height="36dp"
+    android:background="@drawable/bg_settings_icon_circle_blue"
+    android:contentDescription="Setting Icon"
+    android:padding="8dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:tint="@android:color/white"
+    tools:src="@drawable/ic_settings_general" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/setting_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginStart="16dp"
-        android:orientation="vertical">
+        android:layout_marginEnd="16dp"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/setting_subtitle"
+        app:layout_constraintEnd_toStartOf="@+id/setting_chevron"
+        app:layout_constraintStart_toEndOf="@id/setting_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Cài đặt chung" />
 
-        <TextView
-            android:id="@+id/setting_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
-            tools:text="Cài đặt chung"/>
-
-        <TextView
-            android:id="@+id/setting_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="12sp"
-            tools:text="Thay đổi các tùy chỉnh cơ bản"/>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/setting_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/setting_title"
+        app:layout_constraintStart_toStartOf="@id/setting_title"
+        app:layout_constraintTop_toBottomOf="@id/setting_title"
+        tools:text="Thay đổi các tùy chỉnh cơ bản"
+        tools:visibility="visible" />
 
     <ImageView
         android:id="@+id/setting_chevron"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_chevron_right"/>
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_chevron_right"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/text_secondary" />
 
-</LinearLayout>
-    
+    <!-- THÊM VIEW NÀY VÀO: Đường kẻ phân cách -->
+    <View
+        android:id="@+id/setting_divider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="@color/divider_color"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/setting_title"
+        tools:visibility="visible" /></androidx.constraintlayout.widget.ConstraintLayout>

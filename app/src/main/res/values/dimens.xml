@@ -27,6 +27,13 @@
     <dimen name="text_size_date">12sp</dimen>
     <dimen name="text_size_section_header">18sp</dimen>
 
+    <!-- == KÍCH THƯỚC MỚI CHO MÀN HÌNH THÔNG BÁO                 == -->
+    <!-- ========================================================== -->
+    <dimen name="text_size_toolbar_title">20sp</dimen>
+    <dimen name="text_size_notification_title">16sp</dimen>
+    <dimen name="text_size_notification_description">14sp</dimen>
+    <dimen name="text_size_notification_timestamp">12sp</dimen>
+
     <!-- Khác -->
     <dimen name="section_header_line_width">4dp</dimen>
     <!-- Kích thước mặc định của icon trong BottomNav là 24dp.
@@ -36,4 +43,6 @@
     <!-- Kích thước mặc định của chữ là 12sp.
          Chúng ta có thể giữ nguyên hoặc giảm nhẹ xuống 11sp nếu cần. -->
     <dimen name="bottom_nav_text_size">12sp</dimen>
+
+
 </resources>

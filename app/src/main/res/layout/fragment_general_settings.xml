@@ -1,0 +1,59 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"><com.google.android.material.appbar.MaterialToolbar
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    app:navigationIcon="@drawable/ic_arrow_back"
+    app:title="Cài đặt chung"
+    app:titleCentered="true" />
+
+    <!-- Phần Tài khoản -->
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:text="Tài khoản" />
+
+    <include
+        android:id="@+id/editAccountLayout"
+        layout="@layout/item_setting" />
+
+    <!-- Phần Hoạt động -->
+    <TextView
+        style="@style/TextAppearance.MaterialComponents.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="24dp"
+        android:text="Hoạt động" />
+
+    <include
+        android:id="@+id/myBlogsLayout"
+        layout="@layout/item_setting" />
+
+    <include
+        android:id="@+id/savedNewsLayout"
+        layout="@layout/item_setting" />
+
+    <include
+        android:id="@+id/viewedHistoryLayout"
+        layout="@layout/item_setting" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <!-- Phần Xóa tài khoản -->
+    <include
+        android:id="@+id/deleteAccountLayout"
+        layout="@layout/item_setting"
+    android:layout_marginBottom="16dp"
+        tools:ignore="IncludeLayoutParam" />
+</LinearLayout>

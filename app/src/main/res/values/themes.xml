@@ -74,6 +74,37 @@
         <item name="android:lineSpacingMultiplier">1.2</item>
     </style>
 
+    <!-- Style cho Toolbar của màn hình thông báo -->
+    <style name="Widget.App.Toolbar.Notification" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
+        <item name="titleTextAppearance">@style/TextAppearance.App.ToolbarTitle</item>
+        <item name="titleTextColor">@color/text_primary</item>
+    </style>
+
+    <!-- Style cho tiêu đề của các màn hình con (như "Thông báo") -->
+    <style name="TextAppearance.App.ToolbarTitle" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">@dimen/text_size_toolbar_title</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Style cho tiêu đề của một item thông báo -->
+    <style name="TextAppearance.App.Notification.Title" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textSize">@dimen/text_size_notification_title</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Style cho mô tả của một item thông báo -->
+    <style name="TextAppearance.App.Notification.Description" parent="TextAppearance.MaterialComponents.Body2">
+        <item name="android:textSize">@dimen/text_size_notification_description</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <!-- Style cho thời gian của một item thông báo -->
+    <style name="TextAppearance.App.Notification.Timestamp" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">@dimen/text_size_notification_timestamp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
     <!-- ========================================================== -->
     <!-- == STYLE RIÊNG BIỆT CHỈ DÀNH CHO CHIP CÓ ICON           == -->
     <!-- ========================================================== -->
@@ -121,7 +152,23 @@
         <item name="itemPaddingBottom">4dp</item>
     </style>
 
+    <!-- Style cho tiêu đề chính của bài viết -->
+    <style name="TextAppearance.App.BlogPost.Title" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 
+    <!-- Style cho đề mục (tiêu đề phụ) -->
+    <style name="TextAppearance.App.BlogPost.Subtitle" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Style cho đoạn văn bản nội dung -->
+    <style name="TextAppearance.App.BlogPost.Paragraph" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.2</item>
+    </style>
 
     <!-- Các style khác của bạn -->
 

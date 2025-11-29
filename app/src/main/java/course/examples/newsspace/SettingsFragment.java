@@ -11,12 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 
 import course.examples.newsspace.databinding.FragmentSettingsBinding;
 import course.examples.newsspace.databinding.ItemSettingBinding;
 import course.examples.newsspace.model.User;
+import course.examples.newsspace.utils.CredentialsManager;
 import course.examples.newsspace.utils.SessionManager;
 
 public class SettingsFragment extends Fragment {
@@ -60,21 +62,43 @@ public class SettingsFragment extends Fragment {
         // LỖI 2 ĐÃ SỬA (TẠM THỜI):
         // TODO: Thay lại bằng các icon đúng sau khi đã import từ Figma.
         configureSettingItem(binding.generalSettingsLayout, R.drawable.ic_settings_general,
-                "Cài đặt chung", "Thay đổi các tùy chỉnh cơ bản", true, v -> showToast("Chức năng Cài đặt chung"));
+                "Cài đặt chung", "Thay đổi các tùy chỉnh cơ bản", true, true, // <-- Thêm 'true' để ẩn divider
+                v -> NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_generalSettingsFragment)); // <-- CẬP NHẬT NAVIGATE
 
         configureSettingItem(binding.notificationSettingsLayout, R.drawable.ic_settings_notification,
-                "Thông báo", "Tùy chỉnh liên quan đến thông báo", true, v -> showToast("Chức năng Thông báo"));
-
+                "Thông báo", "Tùy chỉnh liên quan đến thông báo", true, true,
+                v -> NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_notificationSettingsFragment));
+        // ...
         configureSettingItem(binding.versionLayout, R.drawable.ic_settings_version,
-                "Phiên bản", "v1.1", false, null);
+                "Phiên bản", "v1.1", false, true, null); // <-- Thêm 'true'
 
         configureSettingItem(binding.termsLayout, R.drawable.ic_settings_terms,
-                "Điều khoản sử dụng", null, true, v -> showToast("Chức năng Điều khoản sử dụng"));
+                "Điều khoản sử dụng", null, true, true, v -> showToast("Chức năng Điều khoản sử dụng")); // <-- Thêm 'true'
 
         configureSettingItem(binding.policyLayout, R.drawable.ic_settings_policy,
-                "Chính sách bảo mật", null, true, v -> showToast("Chức năng Chính sách bảo mật"));
+                "Chính sách bảo mật", null, true, true, v -> showToast("Chức năng Chính sách bảo mật")); // <-- Thêm 'true'
     }
+    // THÊM tham số boolean hideDivider
+    private void configureSettingItem(ItemSettingBinding itemBinding, int iconResId, String title, @Nullable String subtitle, boolean showChevron, boolean hideDivider, @Nullable View.OnClickListener listener) {
+        itemBinding.settingIcon.setImageResource(iconResId);
+        itemBinding.settingTitle.setText(title);
 
+        if (subtitle != null && !subtitle.isEmpty()) {
+            itemBinding.settingSubtitle.setVisibility(View.VISIBLE);
+            itemBinding.settingSubtitle.setText(subtitle);
+        } else {
+            itemBinding.settingSubtitle.setVisibility(View.GONE);
+        }
+
+        itemBinding.settingChevron.setVisibility(showChevron ? View.VISIBLE : View.GONE);
+
+        // THÊM LOGIC NÀY
+        itemBinding.settingDivider.setVisibility(hideDivider ? View.GONE : View.VISIBLE);
+
+        if (listener != null) {
+            itemBinding.getRoot().setOnClickListener(listener);
+        }
+    }
     private void setupLogoutButton() {
         binding.logoutLayout.setOnClickListener(v -> showLogoutConfirmationDialog());
     }
@@ -90,6 +114,10 @@ public class SettingsFragment extends Fragment {
 
     private void performLogout() {
         sessionManager.clearSession();
+
+        // THÊM DÒNG NÀY: Xóa thông tin đăng nhập đã lưu
+        new CredentialsManager(requireContext()).clearCredentials();
+
         Intent intent = new Intent(requireActivity(), SplashActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

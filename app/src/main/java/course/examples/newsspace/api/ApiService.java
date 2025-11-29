@@ -3,13 +3,20 @@ package course.examples.newsspace.api; // Thay bằng package của bạn
 import java.util.List;
 import java.util.Map;
 
+import course.examples.newsspace.model.UpdateProfileRequest;
+import course.examples.newsspace.model.ImageUploadResponse; // Tái sử dụng model này
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.PATCH;
 
 // Import tất cả các lớp Model, Request, Response cần thiết
 import course.examples.newsspace.model.*; // Giả sử tất cả model nằm trong package này
@@ -184,4 +191,83 @@ public interface ApiService {
     @POST("auth/logout") // Hoặc đường dẫn API logout của bạn
     Call<Void> logoutUser(); // Không cần body trả về nên dùng Void
 
+    @GET("notifications") // Endpoint để lấy danh sách thông báo
+    Call<List<NotificationItem>> getNotifications();
+
+    // Giả sử API tìm kiếm của bạn là /search?q=<từ khóa>
+    @GET("search")
+    Call<List<RssItem>> searchArticles(@Query("q") String query);
+
+    @GET("blogs") // Giả sử endpoint là /blogs
+    Call<List<RssItem>> getBlogs();
+
+    /**
+     * Gửi một bài viết mới lên server.
+     * @Body sẽ tự động chuyển đối tượng CreatePostRequest thành JSON.
+     * Call<Void> vì chúng ta không cần nhận lại dữ liệu gì đặc biệt,
+     * chỉ cần biết request có thành công hay không (HTTP 200/201).
+     */
+    @POST("posts") // Thay "posts" bằng endpoint API thật của bạn
+    Call<Void> createPost(@Body CreatePostRequest requestBody);
+
+    /**
+     * Endpoint để upload một file ảnh.
+     * @Multipart cho Retrofit biết đây là một request dạng multipart.
+     * @Part("image") định nghĩa một "phần" của request.
+     *     - "image" là tên key mà backend sẽ dùng để lấy file.
+     *     - MultipartBody.Part chứa dữ liệu nhị phân của file.
+     */
+    @Multipart
+    @POST("upload/image") // Đây là URL endpoint ví dụ, bạn cần thay bằng URL của backend
+    Call<ImageUploadResponse> uploadImage(@Part MultipartBody.Part image);
+
+    /**
+     * Gửi yêu cầu xóa tài khoản của người dùng đã được xác thực.
+     * Call<Void> vì chúng ta không cần nhận lại dữ liệu, chỉ cần biết thành công hay không.
+     */
+    @DELETE("users/me") // Thay bằng endpoint thật của bạn
+    Call<Void> deleteAccount();
+
+    /**
+     * Cập nhật trạng thái thông báo cho một chuyên mục cụ thể.
+     */
+    @PATCH("users/me/category-notifications") // Thay bằng endpoint thật
+    Call<Void> updateCategoryNotificationSetting(@Body UpdateCategoryPrefsRequest requestBody);
+
+
+    // Lấy danh sách bài blog của user
+    @GET("me/posts")
+    Call<List<RssItem>> getMyBlogs();
+
+    // Lấy danh sách tin đã lưu
+    @GET("me/saved-articles")
+    Call<List<RssItem>> getSavedNews();
+
+    // Lấy lịch sử xem
+    @GET("me/history")
+    Call<List<RssItem>> getViewHistory();
+
+    /**
+     * Lấy thông tin chi tiết của người dùng đang đăng nhập.
+     * @return một đối tượng User chứa đầy đủ thông tin.
+     */
+    @GET("users/me") // Endpoint để lấy thông tin cá nhân
+    Call<User> getMyProfile();
+
+    /**
+     * Cập nhật thông tin cá nhân của người dùng.
+     * @param requestBody Đối tượng chứa các thông tin cần thay đổi.
+     * @return đối tượng User với thông tin đã được cập nhật.
+     */
+    @PATCH("users/me") // Dùng PATCH vì chúng ta chỉ cập nhật một phần thông tin
+    Call<User> updateMyProfile(@Body UpdateProfileRequest requestBody);
+
+    /**
+     * Tải lên một ảnh đại diện mới cho người dùng.
+     * @param image File ảnh đã được đóng gói dưới dạng MultipartBody.Part.
+     * @return một đối tượng chứa URL của ảnh mới.
+     */
+    @Multipart
+    @POST("users/me/avatar") // Endpoint để upload avatar
+    Call<ImageUploadResponse> uploadAvatar(@Part MultipartBody.Part image);
 }

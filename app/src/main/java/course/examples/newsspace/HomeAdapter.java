@@ -6,8 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide; // Thư viện tải ảnh, cần thêm vào build.gradle
 import com.google.android.material.chip.Chip;
@@ -196,8 +198,24 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     static class HeaderViewHolder extends RecyclerView.ViewHolder {
         ItemHomeHeaderBinding binding;
 
-        HeaderViewHolder(ItemHomeHeaderBinding binding) {
-            super(binding.getRoot()); this.binding = binding; }
+        public HeaderViewHolder(ItemHomeHeaderBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+
+            // THÊM SỰ KIỆN CLICK VÀO ĐÂY
+            binding.notificationIcon.setOnClickListener(v -> {
+                Navigation.findNavController(v).navigate(R.id.action_home_to_notification);
+            });
+
+
+            // THÊM SỰ KIỆN CLICK CHO ICON TÌM KIẾM
+            binding.searchIcon.setOnClickListener(v ->
+                    Navigation.findNavController(v).navigate(R.id.action_home_to_search));
+        }
+
+        public void bind(HeaderData headerData) {
+            // Hiện tại không cần làm gì ở đây
+        }
     }
 
     // ViewHolder cho thanh chuyên mục

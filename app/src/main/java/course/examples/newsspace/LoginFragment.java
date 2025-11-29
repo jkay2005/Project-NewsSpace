@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
+import course.examples.newsspace.utils.CredentialsManager;
 
 // Import các lớp cần thiết cho việc gọi API
 import course.examples.newsspace.databinding.FragmentLoginBinding;
@@ -30,6 +31,7 @@ public class LoginFragment extends Fragment {
 
     private FragmentLoginBinding binding;
     private SessionManager sessionManager; // Khai báo SessionManager
+    private CredentialsManager credentialsManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -43,6 +45,11 @@ public class LoginFragment extends Fragment {
 
         // Khởi tạo SessionManager
         sessionManager = new SessionManager(requireContext());
+        credentialsManager = new CredentialsManager(requireContext());
+        String savedEmail = credentialsManager.getEmail();
+        if (savedEmail != null) {
+            binding.emailEditText.setText(savedEmail);
+        }
 
         setupClickListeners();
     }
@@ -56,7 +63,7 @@ public class LoginFragment extends Fragment {
     private void handleLogin() {
         String email = binding.emailEditText.getText().toString().trim();
         String password = binding.passwordEditText.getText().toString().trim();
-
+        boolean rememberMe = binding.rememberMeCheckBox.isChecked();
         if (email.isEmpty() || password.isEmpty()) {
             showValidationDialog("Thông tin không hợp lệ", "Vui lòng nhập đầy đủ email và mật khẩu.");
             return;
@@ -81,6 +88,12 @@ public class LoginFragment extends Fragment {
                     // Lưu token và thông tin người dùng
                     sessionManager.saveAuthToken(loginResponse.getToken());
                     sessionManager.saveUser(loginResponse.getUser());
+                    // XỬ LÝ LƯU THÔNG TIN ĐĂNG NHẬP
+                    if (rememberMe) {
+                        credentialsManager.saveCredentials(email, password);
+                    } else {
+                        credentialsManager.clearCredentials();
+                    }
 
                     Toast.makeText(getContext(), "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
 

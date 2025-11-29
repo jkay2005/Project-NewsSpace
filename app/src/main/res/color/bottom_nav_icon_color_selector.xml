@@ -5,4 +5,38 @@
 
     <!-- Trạng thái mặc định, dùng màu xám -->
     <item android:color="@color/grey_500" />
+    <!-- Màu chủ đạo -->
+    <color name="primary_blue">#005DFF</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+
+    <!-- Màu văn bản -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+
+    <!-- Màu trạng thái -->
+    <color name="error_red">#D32F2F</color>
+
+    <!-- Màu khác -->
+    <color name="input_field_border">#E0E0E0</color>
+    <color name="dialog_overlay">#80000000</color>
+    <color name="chip_background">#F6F6F6</color>
+    <color name="section_header_line">@color/primary_blue</color>
+    <color name="footer_background">#FAFAFA</color>
+    <color name="bottom_nav_icon_tint">#757575</color>
+    <color name="grey_200">#EEEEEE</color>
+    <color name="grey_500">#9E9E9E</color>
+
+    <!-- ========================================================== -->
+    <!-- == MÀU SẮC MỚI CHO MÀN HÌNH THÔNG BÁO                   == -->
+    <!-- ========================================================== -->
+    <!-- Màu nền cho item thông báo CHƯA ĐỌC -->
+    <color name="notification_unread_background">#FFFFFF</color>
+
+    <!-- Màu nền cho item thông báo ĐÃ ĐỌC -->
+    <color name="notification_read_background">#F5F5F5</color>
+
+    <!-- Màu cho đường kẻ phân cách -->
+    <color name="divider_color">#E0E0E0</color>
 </selector>

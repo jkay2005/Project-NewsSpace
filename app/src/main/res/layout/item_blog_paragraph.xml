@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/spacing_medium"
+    android:paddingTop="@dimen/spacing_small">
+
+    <EditText
+        android:id="@+id/paragraphEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="top|start"
+        android:hint="Nội dung..."
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine|textCapSentences"
+        android:minHeight="80dp"
+        android:textAppearance="@style/TextAppearance.App.BlogPost.Paragraph"
+        android:textColorHint="@color/text_hint" />
+
+</LinearLayout>

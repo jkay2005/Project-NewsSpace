@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"> <!-- Sử dụng màu nền xám nhạt bạn đã có -->
+    <solid
+        android:color="@color/notification_read_background" /> <!-- Bo góc 16dp để tạo cảm giác mềm mại -->
+    <corners android:radius="16dp" />
+</shape>
