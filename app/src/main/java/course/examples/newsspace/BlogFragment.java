@@ -49,6 +49,7 @@ private void loadBlogs() {
                 blogList.clear();
                 for (RssItem item : response.body()) {
                     blogList.add(Article.createStandardArticle(
+                            item.getId(),
                             item.getTitle(),
                             item.getPublishedAt(),
                             item.getImageUrl()

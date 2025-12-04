@@ -130,6 +130,7 @@ private void loadRecommendedNews() {
                 if (recommendedItems != null) {
                     for (RssItem item : recommendedItems) {
                         articleList.add(Article.createStandardArticle(
+                                item.getId(),
                                 item.getTitle(), item.getPublishedAt(), item.getImageUrl()
                         ));
                     }

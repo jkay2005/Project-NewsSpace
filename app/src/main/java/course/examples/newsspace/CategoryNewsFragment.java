@@ -123,12 +123,14 @@ public class CategoryNewsFragment extends Fragment {
                             if (isFeatured) {
                                 // Dùng phương thức tĩnh của Article để tạo
                                 articleList.add(Article.createFeaturedArticle(
+                                        item.getId(),
                                         item.getTitle(),
                                         item.getContent(), // Giả định content là description
                                         item.getImageUrl()
                                 ));
                             } else {
                                 articleList.add(Article.createStandardArticle(
+                                        item.getId(),
                                         item.getTitle(),
                                         item.getPublishedAt(),
                                         item.getImageUrl()

@@ -41,8 +41,9 @@ public class Article {
     // Constructor rỗng - Bắt buộc phải có để Gson hoạt động chính xác
     public Article() {}
 
-    public static Article createFeaturedArticle(String title, String description, String imageUrl) {
+    public static Article createFeaturedArticle(int id, String title, String description, String imageUrl) {
         Article article = new Article();
+        article.id = id;
         article.title = title;
         article.description = description;
         article.imageUrl = imageUrl;
@@ -50,8 +51,9 @@ public class Article {
         return article;
     }
 
-    public static Article createStandardArticle(String title, String date, String imageUrl) {
+    public static Article createStandardArticle(int id, String title, String date, String imageUrl) {
         Article article = new Article();
+        article.id = id;
         article.title = title;
         article.date = date;
         article.imageUrl = imageUrl;

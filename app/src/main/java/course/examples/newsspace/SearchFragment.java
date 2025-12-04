@@ -101,6 +101,7 @@ private void displayResults(List<RssItem> results) {
     for (RssItem item : results) {
         // Chuyển đổi RssItem thành Article (loại standard)
         articleList.add(Article.createStandardArticle(
+                item.getId(),
                 item.getTitle(),
                 item.getPublishedAt(),
                 item.getImageUrl()

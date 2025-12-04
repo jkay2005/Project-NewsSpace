@@ -90,6 +90,7 @@ public class UserActivityFragment extends Fragment {
                         for (RssItem item : items) {
                             // Chuyển đổi RssItem thành Article để Adapter hiển thị
                             articleList.add(Article.createStandardArticle(
+                                    item.getId(),
                                     item.getTitle(),
                                     item.getPublishedAt(),
                                     item.getImageUrl()

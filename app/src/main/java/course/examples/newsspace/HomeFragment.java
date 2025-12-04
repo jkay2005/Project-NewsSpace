@@ -154,6 +154,7 @@ public class HomeFragment extends Fragment {
             if (featuredCount < 3) {
                 // Sử dụng phương thức tĩnh để tạo một Article nổi bật
                 homeItems.add(Article.createFeaturedArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getContent(), // Giả định content là description ngắn
                         item.getImageUrl()
@@ -172,6 +173,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (moiNhatCount < 5 && item.getSource() != null && "moinhat".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -188,6 +190,7 @@ public class HomeFragment extends Fragment {
             if (thoiSuCount < 5 && item.getSource() != null && "thoisu".equalsIgnoreCase(item.getSource().getTag())) {
                 // Sử dụng phương thức tĩnh để tạo một Article tiêu chuẩn
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -202,6 +205,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (kinhTeCount < 5 && item.getSource() != null && "kinhte".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -217,6 +221,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (chinhTriCount < 5 && item.getSource() != null && "chinhtri".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -231,6 +236,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (theGioiCount < 5 && item.getSource() != null && "thegioi".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -245,6 +251,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (doiSongCount < 5 && item.getSource() != null && "doisong".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -259,6 +266,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (duLichCount < 5 && item.getSource() != null && "dulich".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -273,6 +281,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (vanHoaCount < 5 && item.getSource() != null && "vanhoa".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -287,6 +296,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (giaiTriCount < 5 && item.getSource() != null && "giaitri".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -301,6 +311,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (gioiTreCount < 5 && item.getSource() != null && "gioitre".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -315,6 +326,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (giaoDucCount < 5 && item.getSource() != null && "giaoduc".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -329,6 +341,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (theThaoCount < 5 && item.getSource() != null && "thethao".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -343,6 +356,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (sucKhoeCount < 5 && item.getSource() != null && "suckhoe".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -357,6 +371,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (congNgheCount < 5 && item.getSource() != null && "congnghe".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -371,6 +386,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (thoiTrangCount < 5 && item.getSource() != null && "troitrang".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -385,6 +401,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (xeCount < 5 && item.getSource() != null && "xe".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
@@ -399,6 +416,7 @@ public class HomeFragment extends Fragment {
         for (RssItem item : rssItems) {
             if (tieuDungCount < 5 && item.getSource() != null && "tieudung".equalsIgnoreCase(item.getSource().getTag())) {
                 homeItems.add(Article.createStandardArticle(
+                        item.getId(),
                         item.getTitle(),
                         item.getPublishedAt(),
                         item.getImageUrl()
