@@ -15,6 +15,10 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +28,7 @@ import course.examples.newsspace.model.Article;
 import course.examples.newsspace.model.ArticleHeader;
 import course.examples.newsspace.model.ArticleImage;
 import course.examples.newsspace.model.ArticleParagraph;
+import course.examples.newsspace.model.Author;
 import course.examples.newsspace.model.CommentSection;
 import course.examples.newsspace.model.RelatedNewsHeader;
 import course.examples.newsspace.api.ApiClient;
@@ -153,22 +158,58 @@ public class ArticleDetailFragment extends Fragment
         }
         binding.toolbar.setTitle(category); // Cập nhật tiêu đề Toolbar
 
-        // 1. Thêm Header
-        contentList.add(new ArticleHeader(category, article.getTitle(), article.getAuthor().getName(), article.getDate()));
+        // 1. Thêm Header một cách an toàn
+        Author author = article.getAuthor();
+        String authorName = (author != null && author.getName() != null) ? author.getName() : "Không rõ tác giả";
+        contentList.add(new ArticleHeader(category, article.getTitle(), authorName, article.getDate()));
 
-        // 2. Phân tích nội dung (ví dụ đơn giản)
+        // 2. Phân tích nội dung HTML bằng Jsoup để hiển thị đầy đủ
         if (article.getContent() != null && !article.getContent().isEmpty()) {
-            // TODO: Triển khai một trình phân tích HTML/Markdown tốt hơn
-            String[] parts = article.getContent().split("<img_separator>");
-            for (String part : parts) {
-                if (part.startsWith("http")) {
-                    contentList.add(new ArticleImage(part.trim(), ""));
-                } else if (!part.trim().isEmpty()){
-                    contentList.add(new ArticleParagraph(part.trim()));
+            // Jsoup sẽ phân tích chuỗi HTML thành một cấu trúc cây
+            Document doc = Jsoup.parse(article.getContent());
+
+            // Lấy tất cả các thẻ con trực tiếp của <body>.
+            // Điều này giúp giữ đúng thứ tự của các đoạn văn, hình ảnh, tiêu đề phụ...
+            for (Element element : doc.body().children()) {
+                String tagName = element.tagName().toLowerCase();
+
+                switch (tagName) {
+                    case "p":
+                        // Nếu là thẻ <p> (đoạn văn)
+                        if (!element.text().trim().isEmpty()) {
+                            contentList.add(new ArticleParagraph(element.text()));
+                        }
+                        break;
+                    case "img":
+                        // Nếu là thẻ <img> (hình ảnh)
+                        String imageUrl = element.attr("src");
+                        String caption = element.attr("alt"); // Lấy chú thích từ thuộc tính 'alt'
+                        if (!imageUrl.isEmpty()) {
+                            contentList.add(new ArticleImage(imageUrl, caption));
+                        }
+                        break;
+                    case "h1":
+                    case "h2":
+                    case "h3":
+                    case "h4":
+                        // Bạn có thể tạo một kiểu xem (ViewType) riêng cho tiêu đề phụ
+                        // để có thể tùy chỉnh kích thước, kiểu chữ lớn hơn.
+                        // Tạm thời, ta có thể dùng lại ArticleParagraph.
+                        if (!element.text().trim().isEmpty()) {
+                            contentList.add(new ArticleParagraph(element.text()));
+                        }
+                        break;
+                    // TODO: Mở rộng để xử lý các thẻ khác như <blockquote>, <ul>, <li>
+                    default:
+                        // Với các thẻ khác không xác định, ta chỉ lấy text của chúng
+                        if (!element.text().trim().isEmpty()) {
+                            contentList.add(new ArticleParagraph(element.text()));
+                        }
+                        break;
                 }
             }
         }
-
+        
         // 3. Thêm phần bình luận và tin liên quan
         contentList.add(new CommentSection());
         contentList.add(new RelatedNewsHeader());
