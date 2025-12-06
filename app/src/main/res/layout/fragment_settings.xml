@@ -153,13 +153,23 @@
                 app:tint="@android:color/white" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="Đăng Xuất"
                 android:textColor="@color/error_red"
                 android:textSize="16sp"
                 android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/logoutProgressBar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:indeterminateTint="@color/error_red"
+                android:visibility="gone"
+                tools:visibility="visible"/>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

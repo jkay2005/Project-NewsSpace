@@ -42,6 +42,12 @@ public interface ApiService {
      */
     @POST("api/auth/oauth/google")
     Call<LoginResponse> loginWithGoogle(@Body Map<String, String> idTokenBody);
+    
+    /**
+     * Gửi yêu cầu đăng xuất đến server để vô hiệu hóa token.
+     */
+    @POST("api/auth/logout")
+    Call<Void> logout(@Body LogoutRequest logoutRequest);
 
 
     // ======================================================

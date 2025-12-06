@@ -75,7 +75,7 @@ public class SplashActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Auto-login successful.");
                     SessionManager sessionManager = new SessionManager(SplashActivity.this);
-                    sessionManager.saveAuthToken(response.body().getToken());
+                    sessionManager.saveTokens(response.body().getToken(), response.body().getRefreshToken());
                     sessionManager.saveUser(response.body().getUser());
                     navigateTo(MainActivity.class);
                 } else {

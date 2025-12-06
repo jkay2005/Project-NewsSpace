@@ -1,3 +1,4 @@
+
 package course.examples.newsspace;
 
 import android.content.Intent;
@@ -15,11 +16,16 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.bumptech.glide.Glide;
 
+import course.examples.newsspace.api.ApiClient;
 import course.examples.newsspace.databinding.FragmentSettingsBinding;
 import course.examples.newsspace.databinding.ItemSettingBinding;
+import course.examples.newsspace.model.LogoutRequest;
 import course.examples.newsspace.model.User;
 import course.examples.newsspace.utils.CredentialsManager;
 import course.examples.newsspace.utils.SessionManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SettingsFragment extends Fragment {
 
@@ -47,10 +53,8 @@ public class SettingsFragment extends Fragment {
             binding.usernameTextView.setText(currentUser.getName());
             binding.emailTextView.setText(currentUser.getEmail());
 
-            // LỖI 1 ĐÃ SỬA:
-            // Tạm thời vô hiệu hóa việc tải ảnh từ URL vì model User chưa có getAvatarUrl().
             Glide.with(this)
-                    .load((String) null) // Truyền vào null để Glide bỏ qua việc tải ảnh
+                    .load(currentUser.getAvatarUrl())
                     .placeholder(R.drawable.ic_avatar_placeholder)
                     .error(R.drawable.ic_avatar_placeholder)
                     .circleCrop()
@@ -59,26 +63,24 @@ public class SettingsFragment extends Fragment {
     }
 
     private void setupSettingItems() {
-        // LỖI 2 ĐÃ SỬA (TẠM THỜI):
-        // TODO: Thay lại bằng các icon đúng sau khi đã import từ Figma.
         configureSettingItem(binding.generalSettingsLayout, R.drawable.ic_settings_general,
-                "Cài đặt chung", "Thay đổi các tùy chỉnh cơ bản", true, true, // <-- Thêm 'true' để ẩn divider
-                v -> NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_generalSettingsFragment)); // <-- CẬP NHẬT NAVIGATE
+                "Cài đặt chung", "Thay đổi các tùy chỉnh cơ bản", true, true,
+                v -> NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_generalSettingsFragment));
 
         configureSettingItem(binding.notificationSettingsLayout, R.drawable.ic_settings_notification,
                 "Thông báo", "Tùy chỉnh liên quan đến thông báo", true, true,
                 v -> NavHostFragment.findNavController(this).navigate(R.id.action_settingsFragment_to_notificationSettingsFragment));
-        // ...
+
         configureSettingItem(binding.versionLayout, R.drawable.ic_settings_version,
-                "Phiên bản", "v1.1", false, true, null); // <-- Thêm 'true'
+                "Phiên bản", "v1.1", false, true, null);
 
         configureSettingItem(binding.termsLayout, R.drawable.ic_settings_terms,
-                "Điều khoản sử dụng", null, true, true, v -> showToast("Chức năng Điều khoản sử dụng")); // <-- Thêm 'true'
+                "Điều khoản sử dụng", null, true, true, v -> showToast("Chức năng Điều khoản sử dụng"));
 
         configureSettingItem(binding.policyLayout, R.drawable.ic_settings_policy,
-                "Chính sách bảo mật", null, true, true, v -> showToast("Chức năng Chính sách bảo mật")); // <-- Thêm 'true'
+                "Chính sách bảo mật", null, true, true, v -> showToast("Chức năng Chính sách bảo mật"));
     }
-    // THÊM tham số boolean hideDivider
+
     private void configureSettingItem(ItemSettingBinding itemBinding, int iconResId, String title, @Nullable String subtitle, boolean showChevron, boolean hideDivider, @Nullable View.OnClickListener listener) {
         itemBinding.settingIcon.setImageResource(iconResId);
         itemBinding.settingTitle.setText(title);
@@ -91,14 +93,13 @@ public class SettingsFragment extends Fragment {
         }
 
         itemBinding.settingChevron.setVisibility(showChevron ? View.VISIBLE : View.GONE);
-
-        // THÊM LOGIC NÀY
         itemBinding.settingDivider.setVisibility(hideDivider ? View.GONE : View.VISIBLE);
 
         if (listener != null) {
             itemBinding.getRoot().setOnClickListener(listener);
         }
     }
+
     private void setupLogoutButton() {
         binding.logoutLayout.setOnClickListener(v -> showLogoutConfirmationDialog());
     }
@@ -113,32 +114,46 @@ public class SettingsFragment extends Fragment {
     }
 
     private void performLogout() {
-        sessionManager.clearSession();
+        String refreshToken = sessionManager.getRefreshToken();
+        if (refreshToken == null) {
+            // If there's no refresh token, just clean up locally.
+            Toast.makeText(getContext(), "Không tìm thấy thông tin đăng nhập, đăng xuất cục bộ.", Toast.LENGTH_SHORT).show();
+            cleanupAndNavigate();
+            return;
+        }
 
-        // THÊM DÒNG NÀY: Xóa thông tin đăng nhập đã lưu
+        binding.logoutProgressBar.setVisibility(View.VISIBLE);
+        binding.logoutLayout.setEnabled(false);
+
+        LogoutRequest logoutRequest = new LogoutRequest(refreshToken);
+
+        ApiClient.getApiService(requireContext()).logout(logoutRequest).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                // Backend request finished, proceed with client-side cleanup regardless of outcome
+                cleanupAndNavigate();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                // Network error or other issue, still proceed with client-side cleanup
+                Toast.makeText(getContext(), "Không thể kết nối đến máy chủ, đăng xuất cục bộ.", Toast.LENGTH_SHORT).show();
+                cleanupAndNavigate();
+            }
+        });
+    }
+
+    private void cleanupAndNavigate() {
+        // Clear local session and credentials
+        sessionManager.clearSession();
         new CredentialsManager(requireContext()).clearCredentials();
 
+        // Navigate to SplashActivity and clear back stack
         Intent intent = new Intent(requireActivity(), SplashActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        requireActivity().finish();
-    }
-
-    private void configureSettingItem(ItemSettingBinding itemBinding, int iconResId, String title, @Nullable String subtitle, boolean showChevron, @Nullable View.OnClickListener listener) {
-        itemBinding.settingIcon.setImageResource(iconResId);
-        itemBinding.settingTitle.setText(title);
-
-        if (subtitle != null && !subtitle.isEmpty()) {
-            itemBinding.settingSubtitle.setVisibility(View.VISIBLE);
-            itemBinding.settingSubtitle.setText(subtitle);
-        } else {
-            itemBinding.settingSubtitle.setVisibility(View.GONE);
-        }
-
-        itemBinding.settingChevron.setVisibility(showChevron ? View.VISIBLE : View.GONE);
-
-        if (listener != null) {
-            itemBinding.getRoot().setOnClickListener(listener);
+        if (getActivity() != null) {
+            getActivity().finish();
         }
     }
 
