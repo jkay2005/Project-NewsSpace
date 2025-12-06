@@ -47,6 +47,14 @@ public interface ApiService {
     // ======================================================
     // Articles API - API Bài viết (do hệ thống tạo)
     // ======================================================
+    /**
+     * Lấy danh sách các bài báo theo chuyên mục.
+     * Tương ứng với endpoint: /api/articles?category={categoryApiKey}
+     * @param categoryApiKey Khóa của chuyên mục (ví dụ: "world", "business").
+     * @return Một đối tượng Call chứa danh sách các bài báo.
+     */
+    @GET("api/articles") // Giả sử endpoint của bạn có dạng "api/articles"
+    Call<List<Article>> getArticlesByCategory(@Query("category") String categoryApiKey);
 
     /**
      * Lấy danh sách tất cả các bài viết.
