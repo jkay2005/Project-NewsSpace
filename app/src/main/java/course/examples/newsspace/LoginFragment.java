@@ -84,10 +84,25 @@ public class LoginFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     // ĐĂNG NHẬP THÀNH CÔNG
                     LoginResponse loginResponse = response.body();
+                    
+                    // --- BẮT ĐẦU LOGIC TRÍCH XUẤT COOKIE ---
+                    String refreshTokenFromCookie = null;
+                    String cookieHeader = response.headers().get("Set-Cookie");
+                    if (cookieHeader != null && cookieHeader.contains("refreshToken=")) {
+                        String[] parts = cookieHeader.split(";");
+                        for (String part : parts) {
+                            if (part.trim().startsWith("refreshToken=")) {
+                                refreshTokenFromCookie = part.trim().substring("refreshToken=".length());
+                                break;
+                            }
+                        }
+                    }
+                    // --- KẾT THÚC LOGIC TRÍCH XUẤT COOKIE ---
 
                     // Lưu token và thông tin người dùng
-                    sessionManager.saveAuthToken(loginResponse.getToken());
+                    sessionManager.saveTokens(loginResponse.getToken(), refreshTokenFromCookie);
                     sessionManager.saveUser(loginResponse.getUser());
+                    
                     // XỬ LÝ LƯU THÔNG TIN ĐĂNG NHẬP
                     if (rememberMe) {
                         credentialsManager.saveCredentials(email, password);
@@ -118,25 +133,6 @@ public class LoginFragment extends Fragment {
                 showValidationDialog("Lỗi kết nối", "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối internet của bạn.");
             }
         });
-
-        // ==========================================================
-        // == THÊM PHẦN GIẢ LẬP ĐĂNG NHẬP THÀNH CÔNG             ==
-        // ==========================================================
-        // Dùng Handler để giả lập độ trễ mạng, tạo cảm giác thật hơn
-//        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-//            showLoading(false);
-//
-//            // Giả vờ như đã nhận được token và thông tin người dùng
-//            // Bạn không cần lưu token thật vào SessionManager lúc này
-//
-//            Toast.makeText(getContext(), "Đăng nhập thành công! (Chế độ Demo)", Toast.LENGTH_SHORT).show();
-//
-//            // Chuyển sang MainActivity
-//            Intent intent = new Intent(getActivity(), MainActivity.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//            startActivity(intent);
-//
-//        }, 1000); // Giả lập chờ 1 giây
     }
 
     private void showLoading(boolean isLoading) {
@@ -161,6 +157,4 @@ public class LoginFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
-
 }
