@@ -1,4 +1,4 @@
-package course.examples.newsspace; // Thay bằng package của bạn
+package course.examples.newsspace;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +21,7 @@ import java.util.Map;
 import course.examples.newsspace.api.ApiClient;
 import course.examples.newsspace.databinding.FragmentCategoryNewsBinding;
 import course.examples.newsspace.model.Article;
+import course.examples.newsspace.utils.TopicHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,58 +31,20 @@ public class CategoryNewsFragment extends Fragment {
     private FragmentCategoryNewsBinding binding;
     private ArticleListAdapter adapter;
     private final List<Article> articleList = new ArrayList<>();
-    private String categoryApiKey;
+    private String topicSlug;
     private String categoryDisplayName;
-
-    // Tạo lại bản đồ đối chiếu để tìm tên hiển thị từ khóa API
-    private final Map<String, String> categoryMap = new LinkedHashMap<>();
-
-    private void initializeCategoryMap() {
-        categoryMap.put("Mới nhất", "breaking-news");
-        categoryMap.put("Thời sự", "nation");
-        categoryMap.put("Chính trị", "nation");
-        categoryMap.put("Thế giới", "world");
-        categoryMap.put("Kinh tế", "business");
-        categoryMap.put("Giải trí", "entertainment");
-        categoryMap.put("Thể thao", "sports");
-        categoryMap.put("Sức khỏe", "health");
-        categoryMap.put("Công nghệ", "technology");
-        categoryMap.put("Khoa học", "science");
-    }
-
-    /**
-     * Tìm tên hiển thị (FE) dựa trên khóa API (BE).
-     * @param apiKey Khóa API, ví dụ: "nation".
-     * @return Tên hiển thị, ví dụ: "Thời sự".
-     */
-    private String findDisplayName(String apiKey) {
-        if (apiKey == null) return "Tin tức"; // Fallback
-        for (Map.Entry<String, String> entry : categoryMap.entrySet()) {
-            if (apiKey.equals(entry.getValue())) {
-                return entry.getKey(); // Trả về displayName đầu tiên tìm thấy
-            }
-        }
-        return "Tin tức"; // Fallback nếu không tìm thấy
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initializeCategoryMap();
-
-        // **BƯỚC 1: THIẾT LẬP GIÁ TRỊ MẶC ĐỊNH**
-        // Mặc định là tin nổi bật nếu không có tham số nào được truyền.
-        categoryApiKey = "breaking-news";
-        categoryDisplayName = "Tin nổi bật";
-
-        // **BƯỚC 2: KIỂM TRA VÀ GHI ĐÈ BẰNG THAM SỐ (NẾU CÓ)**
+        // Get the arguments passed from HomeFragment
         if (getArguments() != null) {
-            String passedApiKey = CategoryNewsFragmentArgs.fromBundle(getArguments()).getCategoryName();
-            if (passedApiKey != null && !passedApiKey.isEmpty()) {
-                categoryApiKey = passedApiKey;
-                // Dùng khóa API vừa nhận để tìm lại tên hiển thị cho tiêu đề
-                categoryDisplayName = findDisplayName(categoryApiKey);
-            }
+            topicSlug = CategoryNewsFragmentArgs.fromBundle(getArguments()).getCategoryName();
+            // Capitalize the first letter for the title
+            categoryDisplayName = topicSlug.substring(0, 1).toUpperCase() + topicSlug.substring(1);
+        } else {
+            topicSlug = "general"; // Fallback topic
+            categoryDisplayName = "General";
         }
     }
 
@@ -94,11 +57,9 @@ public class CategoryNewsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Bây giờ các biến luôn có giá trị hợp lệ (hoặc mặc định hoặc từ tham số)
         setupToolbar(categoryDisplayName);
         setupRecyclerView();
-        loadNewsData(categoryApiKey);
+        loadNewsData(topicSlug);
     }
 
     private void setupToolbar(String title) {
@@ -112,12 +73,12 @@ public class CategoryNewsFragment extends Fragment {
         binding.newsRecyclerView.setAdapter(adapter);
     }
 
-    private void loadNewsData(String apiKey) {
+    private void loadNewsData(String slug) {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.newsRecyclerView.setVisibility(View.GONE);
 
-        // Sử dụng API mới để lấy bài báo theo chuyên mục
-        ApiClient.getApiService(requireContext()).getArticlesByCategory(apiKey).enqueue(new Callback<List<Article>>() {
+        // Use the new, more efficient API endpoint
+        ApiClient.getApiService(requireContext()).getArticlesByTopic(slug).enqueue(new Callback<List<Article>>() {
             @Override
             public void onResponse(@NonNull Call<List<Article>> call, @NonNull Response<List<Article>> response) {
                 binding.progressBar.setVisibility(View.GONE);
@@ -141,7 +102,7 @@ public class CategoryNewsFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<List<Article>> call, @NonNull Throwable t) {
                 binding.progressBar.setVisibility(View.GONE);
-                Log.e("CategoryNewsFragment", "API Call Failed: " + t.getMessage());
+                Log.e("CategoryNewsFragment", "API Call Failed for topic " + slug + ": " + t.getMessage());
                 Toast.makeText(getContext(), "Lỗi mạng. Vui lòng kiểm tra kết nối.", Toast.LENGTH_SHORT).show();
             }
         });
