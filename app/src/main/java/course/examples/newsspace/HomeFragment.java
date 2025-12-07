@@ -35,10 +35,10 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private HomeAdapter homeAdapter;
     private final List<Object> homeItems = new ArrayList<>();
+    // Sửa lỗi: Loại bỏ "Chính trị" vì có thể nó không có endpoint riêng
     private final List<String> categories = Arrays.asList(
-            "Mới nhất", "Thời sự", "Thế giới", "Kinh tế", "Đời sống", "Du lịch",
-            "Văn hóa", "Giải trí", "Giáo dục", "Thể thao", "Sức khỏe", "Công nghệ",
-            "Thời trang", "Xe", "Tiêu dùng"
+            "Mới nhất", "Thời sự", "Thế giới", "Kinh tế", "Giải trí",
+            "Thể thao", "Sức khỏe", "Công nghệ", "Khoa học"
     );
 
     @Override
@@ -66,6 +66,7 @@ public class HomeFragment extends Fragment {
         ApiClient.getApiService(requireContext()).getRssItems().enqueue(new Callback<List<RssItem>>() {
             @Override
             public void onResponse(@NonNull Call<List<RssItem>> call, @NonNull Response<List<RssItem>> response) {
+                if (binding == null) return; // Add null check here
                 if (response.isSuccessful() && response.body() != null) {
                     List<RssItem> featuredItems = response.body();
 
@@ -102,6 +103,7 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<List<RssItem>> call, @NonNull Throwable t) {
+                if (binding == null) return; // Add null check here
                 binding.progressBar.setVisibility(View.GONE);
                 Log.e("HomeFragment", "API Call Failed for featured items: " + t.getMessage());
                 Toast.makeText(getContext(), "Lỗi mạng, không thể tải dữ liệu", Toast.LENGTH_SHORT).show();
@@ -114,15 +116,17 @@ public class HomeFragment extends Fragment {
         AtomicInteger remainingCalls = new AtomicInteger(categories.size());
 
         for (String categoryName : categories) {
-            String topicSlug = TopicHelper.toSlug(categoryName);
-            
-            ApiClient.getApiService(requireContext()).getArticlesByTopic(topicSlug).enqueue(new Callback<List<Article>>() {
+            // Use TopicHelper to get the correct API key from the mapping
+            String apiTopicKey = TopicHelper.getApiTopicKey(categoryName);
+
+            ApiClient.getApiService(requireContext()).getArticlesByTopic(apiTopicKey).enqueue(new Callback<List<Article>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<Article>> call, @NonNull Response<List<Article>> response) {
+                    if (binding == null) return; // Add null check here
                     if (response.isSuccessful() && response.body() != null) {
                         List<Article> articles = response.body();
                         if (!articles.isEmpty()) {
-                            // Add section header
+                            // Add section header with the original display name
                             homeItems.add(new SectionHeader(categoryName));
                             // Add articles to the list (limit to 5 for display)
                             int count = 0;
@@ -148,7 +152,8 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onFailure(@NonNull Call<List<Article>> call, @NonNull Throwable t) {
-                    Log.e("HomeFragment", "API Call Failed for topic " + topicSlug + ": " + t.getMessage());
+                    if (binding == null) return; // Add null check here
+                    Log.e("HomeFragment", "API Call Failed for topic " + categoryName + ": " + t.getMessage());
                     // Check if this is the last call to finish
                     if (remainingCalls.decrementAndGet() == 0) {
                         onAllCategoriesLoaded();
@@ -160,6 +165,7 @@ public class HomeFragment extends Fragment {
 
     private void onAllCategoriesLoaded() {
         // This is called when the last category API call has finished
+        if (binding == null) return; // Add null check here
         binding.progressBar.setVisibility(View.GONE);
         homeItems.add(new FooterData());
         homeAdapter.notifyDataSetChanged();

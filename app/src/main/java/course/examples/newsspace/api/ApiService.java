@@ -1,10 +1,10 @@
-package course.examples.newsspace.api; // Thay bằng package của bạn
+package course.examples.newsspace.api;
 
 import java.util.List;
 import java.util.Map;
 
 import course.examples.newsspace.model.UpdateProfileRequest;
-import course.examples.newsspace.model.ImageUploadResponse; // Tái sử dụng model này
+import course.examples.newsspace.model.ImageUploadResponse;
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -19,10 +19,13 @@ import retrofit2.http.Query;
 import retrofit2.http.PATCH;
 
 // Import tất cả các lớp Model, Request, Response cần thiết
-import course.examples.newsspace.model.*; // Giả sử tất cả model nằm trong package này
+import course.examples.newsspace.model.*;
 
 public interface ApiService {
-    // API Xác thực
+
+    // ======================================================
+    // Auth API - API Xác thực
+    // ======================================================
 
     @POST("api/auth/register")
     Call<User> registerUser(@Body RegisterRequest registerRequest);
@@ -32,39 +35,79 @@ public interface ApiService {
 
     @POST("api/auth/oauth/google")
     Call<LoginResponse> loginWithGoogle(@Body Map<String, String> idTokenBody);
-    
+
     @POST("api/auth/logout")
     Call<Void> logout(@Body LogoutRequest logoutRequest);
 
+    @POST("api/auth/forgot-password")
+    Call<Void> forgotPassword(@Body Map<String, String> emailBody);
+
+    @POST("api/auth/reset-password")
+    Call<Void> resetPassword(@Body Map<String, String> resetPasswordBody);
+
+    @POST("api/auth/verify-email")
+    Call<Void> verifyOtp(@Body VerifyOtpRequest request);
+
+    @POST("api/auth/resend-otp")
+    Call<Void> resendOtp(@Body ResendOtpRequest request);
 
     // ======================================================
-    // Articles API - API Bài viết (do hệ thống tạo)
+    // User Profile API - API Hồ sơ người dùng
     // ======================================================
-    /**
-     * Lấy danh sách các bài báo theo chuyên mục.
-     * Tương ứng với endpoint: /api/articles?category={categoryApiKey}
-     * @param categoryApiKey Khóa của chuyên mục (ví dụ: "world", "business").
-     * @return Một đối tượng Call chứa danh sách các bài báo.
-     */
-    @GET("api/articles") // Giả sử endpoint của bạn có dạng "api/articles"
-    Call<List<Article>> getArticlesByCategory(@Query("category") String categoryApiKey);
+
+    @GET("api/users/me")
+    Call<User> getMyProfile();
+
+    @PATCH("api/users/me")
+    Call<User> updateMyProfile(@Body UpdateProfileRequest requestBody);
+
+    @Multipart
+    @POST("api/users/me/avatar")
+    Call<ImageUploadResponse> uploadAvatar(@Part MultipartBody.Part image);
+
+    @DELETE("api/users/me")
+    Call<Void> deleteAccount();
+
+    @PATCH("api/users/me/category-notifications")
+    Call<Void> updateCategoryNotificationSetting(@Body UpdateCategoryPrefsRequest requestBody);
+
+    @GET("api/me/posts")
+    Call<List<RssItem>> getMyBlogs();
+
+    @GET("api/me/saved-articles")
+    Call<List<RssItem>> getSavedNews();
+
+    @GET("api/me/history")
+    Call<List<RssItem>> getViewHistory();
+
+    // ======================================================
+    // Articles & Blogs API - API Bài viết và Blog
+    // ======================================================
 
     @GET("api/articles")
     Call<List<Article>> getArticles();
 
-    /**
-     * Lấy danh sách bài viết theo một chủ đề cụ thể (topic).
-     * @param topic Slug của chủ đề (ví dụ: "the-thao", "cong-nghe").
-     */
+    @GET("api/articles")
+    Call<List<Article>> getArticlesByCategory(@Query("category") String categoryApiKey);
+
     @GET("api/articles/topic/{topic}")
     Call<List<Article>> getArticlesByTopic(@Path("topic") String topic);
-
-    @POST("api/articles")
-    Call<Article> createArticle(@Body CreateArticleRequest articleRequest);
 
     @GET("api/articles/{id}")
     Call<Article> getArticleDetail(@Path("id") int articleId);
     
+    @POST("api/articles")
+    Call<Article> createArticle(@Body CreateArticleRequest articleRequest); // Admin or specific roles
+
+    @GET("api/blogs")
+    Call<List<RssItem>> getBlogs();
+
+    @POST("api/blogs")
+    Call<Blog> createBlogPost(@Body CreateBlogRequest createBlogRequest);
+
+    @POST("api/blogs/{id}/comments")
+    Call<Comment> createComment(@Path("id") int blogId, @Body CreateCommentRequest createCommentRequest);
+
     // ======================================================
     // RSS API - API Quản lý và Lấy tin RSS
     // ======================================================
@@ -75,18 +118,6 @@ public interface ApiService {
     @GET("api/rss/items")
     Call<List<RssItem>> getRssItems();
 
-
-    // ======================================================
-    // Blog API - API Blog do người dùng đăng
-    // ======================================================
-
-    @POST("api/blogs")
-    Call<Blog> createBlogPost(@Body CreateBlogRequest createBlogRequest);
-
-    @POST("api/blogs/{id}/comments")
-    Call<Comment> createComment(@Path("id") int blogId, @Body CreateCommentRequest createCommentRequest);
-
-
     // ======================================================
     // Recommendations API - API Gợi ý
     // ======================================================
@@ -94,18 +125,44 @@ public interface ApiService {
     @GET("api/recommendations")
     Call<RecommendationResponse> getRecommendations();
 
-    @PUT("api/recommendations/preferences")
-    Call<UpdatePreferencesRequest> updatePreferences(@Body UpdatePreferencesRequest preferencesRequest);
-
     @GET("api/recommendations/preferences")
     Call<UpdatePreferencesRequest> getUserPreferences();
 
-    @GET("api/categories")
-    Call<List<Category>> getAllCategories();
+    @PUT("api/recommendations/preferences")
+    Call<UpdatePreferencesRequest> updatePreferences(@Body UpdatePreferencesRequest preferencesRequest);
 
     @POST("api/recommendations/feedback")
     Call<Feedback> createFeedback(@Body FeedbackRequest feedbackRequest);
 
+    // ======================================================
+    // Bookmarks API - API Đánh dấu
+    // ======================================================
+    
+    @GET("api/bookmarks")
+    Call<BookmarkResponse> getBookmarks();
+
+    @POST("api/bookmarks/collections")
+    Call<Void> createBookmarkCollection(@Body Map<String, String> nameBody);
+
+    // ======================================================
+    // General & Misc API - API Chung & Khác
+    // ======================================================
+
+    @GET("api/categories")
+    Call<List<Category>> getAllCategories();
+
+    @GET("api/notifications")
+    Call<List<NotificationItem>> getNotifications();
+
+    @GET("api/search")
+    Call<List<RssItem>> searchArticles(@Query("q") String query);
+
+    @POST("api/posts")
+    Call<Void> createPost(@Body CreatePostRequest requestBody);
+
+    @Multipart
+    @POST("api/upload/image")
+    Call<ImageUploadResponse> uploadImage(@Part MultipartBody.Part image);
 
     // ======================================================
     // Settings API - API Cài đặt người dùng
@@ -117,7 +174,6 @@ public interface ApiService {
     @PUT("api/settings/notifications")
     Call<UpdateNotificationsRequest> updateNotifications(@Body UpdateNotificationsRequest notificationsRequest);
 
-
     // ======================================================
     // Admin API - API Quản trị
     // ======================================================
@@ -127,64 +183,4 @@ public interface ApiService {
 
     @PUT("api/admin/users/{id}")
     Call<User> updateUser(@Path("id") int userId, @Body UpdateUserRequest updateUserRequest);
-
-    @GET("api/bookmarks")
-    Call<BookmarkResponse> getBookmarks();
-
-    @POST("api/bookmarks/collections")
-    Call<Void> createBookmarkCollection(@Body Map<String, String> nameBody);
-
-
-    public class OtpRequest {
-        private String email;
-        private String otp;
-        public OtpRequest(String email, String otp) { this.email = email; this.otp = otp; }
-    }
-
-    @POST("api/auth/verify-email")
-    Call<Void> verifyOtp(@Body VerifyOtpRequest request);
-
-    @POST("api/auth/resend-otp")
-    Call<Void> resendOtp(@Body ResendOtpRequest request);
-
-    @GET("notifications")
-    Call<List<NotificationItem>> getNotifications();
-
-    @GET("search")
-    Call<List<RssItem>> searchArticles(@Query("q") String query);
-
-    @GET("blogs")
-    Call<List<RssItem>> getBlogs();
-
-    @POST("posts")
-    Call<Void> createPost(@Body CreatePostRequest requestBody);
-
-    @Multipart
-    @POST("upload/image")
-    Call<ImageUploadResponse> uploadImage(@Part MultipartBody.Part image);
-
-    @DELETE("users/me")
-    Call<Void> deleteAccount();
-
-    @PATCH("users/me/category-notifications")
-    Call<Void> updateCategoryNotificationSetting(@Body UpdateCategoryPrefsRequest requestBody);
-
-    @GET("me/posts")
-    Call<List<RssItem>> getMyBlogs();
-
-    @GET("me/saved-articles")
-    Call<List<RssItem>> getSavedNews();
-
-    @GET("me/history")
-    Call<List<RssItem>> getViewHistory();
-
-    @GET("users/me")
-    Call<User> getMyProfile();
-
-    @PATCH("users/me")
-    Call<User> updateMyProfile(@Body UpdateProfileRequest requestBody);
-
-    @Multipart
-    @POST("users/me/avatar")
-    Call<ImageUploadResponse> uploadAvatar(@Part MultipartBody.Part image);
 }

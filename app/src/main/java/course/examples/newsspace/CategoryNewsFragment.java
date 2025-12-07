@@ -77,8 +77,11 @@ public class CategoryNewsFragment extends Fragment {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.newsRecyclerView.setVisibility(View.GONE);
 
+        // Get the correct API key from the mapping
+        String apiTopicKey = TopicHelper.getApiTopicKey(slug);
+
         // Use the new, more efficient API endpoint
-        ApiClient.getApiService(requireContext()).getArticlesByTopic(slug).enqueue(new Callback<List<Article>>() {
+        ApiClient.getApiService(requireContext()).getArticlesByTopic(apiTopicKey).enqueue(new Callback<List<Article>>() {
             @Override
             public void onResponse(@NonNull Call<List<Article>> call, @NonNull Response<List<Article>> response) {
                 binding.progressBar.setVisibility(View.GONE);

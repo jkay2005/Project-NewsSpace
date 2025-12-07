@@ -2,6 +2,7 @@ package course.examples.newsspace; // Thay bằng package của bạn
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
@@ -48,10 +49,8 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Article article = articles.get(position);
         if (holder.getItemViewType() == VIEW_TYPE_FEATURED) {
-            // Gọi phương thức bind của ViewHolder tương ứng
             ((FeaturedNewsViewHolder) holder).bind(article);
         } else {
-            // Gọi phương thức bind của ViewHolder tương ứng
             ((StandardNewsViewHolder) holder).bind(article);
         }
     }
@@ -61,10 +60,6 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         return articles.size();
     }
 
-    // ===================================================================================
-    // CÁC LỚP VIEWHOLDER ĐÃ ĐƯỢC CẬP NHẬT
-    // ===================================================================================
-
     public static class FeaturedNewsViewHolder extends RecyclerView.ViewHolder {
         ItemFeaturedNewsCardBinding binding;
 
@@ -73,28 +68,25 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             this.binding = binding;
         }
 
-        /**
-         * Phương thức riêng để gán dữ liệu và xử lý sự kiện cho ViewHolder này.
-         */
         void bind(Article article) {
             binding.newsTitleTextView.setText(article.getTitle());
             binding.newsDescriptionTextView.setText(article.getDescription());
             binding.dateTextView.setText(article.getDate());
 
-            Glide.with(itemView.getContext())
-                    .load(article.getImageUrl())
-                    .centerCrop()
-                    .placeholder(R.color.grey_200)
-                    .into(binding.newsImageView);
+            if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
+                binding.newsImageView.setVisibility(View.VISIBLE);
+                Glide.with(itemView.getContext())
+                        .load(article.getImageUrl())
+                        .centerCrop()
+                        .placeholder(R.color.grey_200)
+                        .into(binding.newsImageView);
+            } else {
+                binding.newsImageView.setVisibility(View.GONE);
+            }
 
-            // Gán sự kiện click cho toàn bộ thẻ tin
             itemView.setOnClickListener(v -> {
-                // Tạo action để điều hướng từ CategoryNewsFragment sang ArticleDetailFragment
-                // và truyền vào ID của bài báo.
                 CategoryNewsFragmentDirections.ActionCategoryNewsFragmentToArticleDetailFragment action =
                         CategoryNewsFragmentDirections.actionCategoryNewsFragmentToArticleDetailFragment(article.getId());
-
-                // Tìm NavController và thực hiện điều hướng
                 Navigation.findNavController(v).navigate(action);
             });
         }
@@ -108,28 +100,26 @@ public class ArticleListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             this.binding = binding;
         }
 
-        /**
-         * Phương thức riêng để gán dữ liệu và xử lý sự kiện cho ViewHolder này.
-         */
         void bind(Article article) {
             binding.newsTitleTextView.setText(article.getTitle());
             binding.dateTextView.setText(article.getDate());
 
-            Glide.with(itemView.getContext())
-                    .load(article.getImageUrl())
-                    .centerCrop()
-                    .placeholder(R.color.grey_200)
-                    .into(binding.newsImageView);
+            if (article.getImageUrl() != null && !article.getImageUrl().isEmpty()) {
+                binding.newsImageView.setVisibility(View.VISIBLE);
+                Glide.with(itemView.getContext())
+                        .load(article.getImageUrl())
+                        .centerCrop()
+                        .placeholder(R.color.grey_200)
+                        .into(binding.newsImageView);
+            } else {
+                binding.newsImageView.setVisibility(View.GONE);
+            }
 
-            // Gán sự kiện click cho toàn bộ thẻ tin
             itemView.setOnClickListener(v -> {
-                // Tạo một Bundle để chứa articleId
                 Bundle bundle = new Bundle();
                 bundle.putInt("articleId", article.getId());
-                // Tạo action để điều hướng từ CategoryNewsFragment
                 CategoryNewsFragmentDirections.ActionCategoryNewsFragmentToArticleDetailFragment action =
                         CategoryNewsFragmentDirections.actionCategoryNewsFragmentToArticleDetailFragment(article.getId());
-
                 Navigation.findNavController(v).navigate(action);
             });
         }

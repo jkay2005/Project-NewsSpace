@@ -27,7 +27,8 @@ public class OtpFragment extends Fragment {
     private FragmentOtpBinding binding;
     private CountDownTimer countDownTimer;
 
-    private String userEmail; // Biến để lưu email nhận từ màn hình trước
+    private String userEmail;
+    private String otpType;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -39,14 +40,14 @@ public class OtpFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Nhận và lưu email từ Fragment trước bằng Safe Args
         if (getArguments() != null) {
-            userEmail = OtpFragmentArgs.fromBundle(getArguments()).getEmail();
+            OtpFragmentArgs args = OtpFragmentArgs.fromBundle(getArguments());
+            userEmail = args.getEmail();
+            otpType = args.getOtpType();
             String description = "Chúng tôi đã gửi mã OTP đến email\n" + userEmail;
             binding.descriptionTextView.setText(description);
         } else {
-            // Xử lý trường hợp không nhận được email (lỗi)
-            showErrorDialog("Lỗi", "Không nhận được thông tin email.");
+            showErrorDialog("Lỗi", "Không nhận được thông tin cần thiết.");
             NavHostFragment.findNavController(this).navigateUp();
             return;
         }
@@ -57,38 +58,39 @@ public class OtpFragment extends Fragment {
         startCountdown();
     }
 
-
     private void handleOtpVerification() {
         String otp = binding.otpEditText.getText().toString().trim();
 
-        // Validation
         if (otp.length() < 6) {
             showErrorDialog("Lỗi", "Vui lòng nhập đủ 6 ký tự của mã OTP.");
             return;
         }
 
-        showLoading(true);
+        // Dựa trên mã backend, việc xác thực OTP cho 'quên mật khẩu'
+        // xảy ra cùng lúc với việc đặt lại mật khẩu ở màn hình tiếp theo.
+        // Vì vậy, nếu là luồng 'quên mật khẩu', chúng ta chỉ chuyển OTP
+        // sang màn hình ResetPasswordFragment mà không gọi API xác thực ở đây.
+        if ("forgotPassword".equals(otpType)) {
+            OtpFragmentDirections.ActionOtpFragmentToResetPasswordFragment action =
+                    OtpFragmentDirections.actionOtpFragmentToResetPasswordFragment(userEmail, otp);
+            NavHostFragment.findNavController(OtpFragment.this).navigate(action);
+            return; // Bỏ qua phần gọi API bên dưới
+        }
 
-        // 1. Tạo request body
+        // Logic xác thực OTP cho quy trình đăng ký vẫn giữ nguyên
+        showLoading(true);
         VerifyOtpRequest request = new VerifyOtpRequest(userEmail, otp);
 
-        // 2. Gọi API xác thực OTP
         ApiClient.getApiService(requireContext()).verifyOtp(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 showLoading(false);
                 if (response.isSuccessful()) {
-                    // XÁC THỰC THÀNH CÔNG
                     Toast.makeText(getContext(), "Xác thực thành công!", Toast.LENGTH_SHORT).show();
-
-                    // TODO: Quyết định luồng đi tiếp theo
-                    // Nếu đến từ Register -> Chuyển đến RegisterSuccess
-                    // Nếu đến từ ForgotPassword -> Chuyển đến ResetPassword
-                    // Tạm thời mặc định là luồng đăng ký
+                    // Vì đã xử lý 'forgotPassword' ở trên, ở đây chỉ còn trường hợp đăng ký
                     NavHostFragment.findNavController(OtpFragment.this)
                             .navigate(R.id.action_otpFragment_to_registerSuccessFragment);
                 } else {
-                    // XÁC THỰC THẤT BẠI (sai OTP)
                     showErrorDialog("Thất bại", "Mã OTP không chính xác hoặc đã hết hạn.");
                 }
             }
@@ -103,21 +105,19 @@ public class OtpFragment extends Fragment {
     }
 
     private void handleResendOtp() {
-        binding.resendOtpTextView.setEnabled(false); // Vô hiệu hóa nút
+        binding.resendOtpTextView.setEnabled(false);
 
-        // 1. Tạo request body
         ResendOtpRequest request = new ResendOtpRequest(userEmail);
 
-        // 2. Gọi API gửi lại OTP
         ApiClient.getApiService(requireContext()).resendOtp(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Đã gửi lại mã OTP.", Toast.LENGTH_SHORT).show();
-                    startCountdown(); // Bắt đầu lại bộ đếm ngược
+                    startCountdown();
                 } else {
                     Toast.makeText(getContext(), "Gửi lại mã thất bại. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show();
-                    binding.resendOtpTextView.setEnabled(true); // Cho phép nhấn lại
+                    binding.resendOtpTextView.setEnabled(true);
                 }
             }
 
@@ -132,7 +132,7 @@ public class OtpFragment extends Fragment {
 
     private void startCountdown() {
         binding.resendOtpTextView.setEnabled(false);
-        countDownTimer = new CountDownTimer(30000, 1000) { // Đếm ngược 30 giây
+        countDownTimer = new CountDownTimer(30000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 String timeLeft = String.format(Locale.getDefault(), "Gửi lại mã sau (%ds)", millisUntilFinished / 1000);
@@ -147,7 +147,6 @@ public class OtpFragment extends Fragment {
         }.start();
     }
 
-    // Các hàm Helper
     private void showLoading(boolean isLoading) {
         if (isLoading) {
             binding.loadingProgressBar.setVisibility(View.VISIBLE);
@@ -171,7 +170,6 @@ public class OtpFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // Hủy bộ đếm ngược để tránh memory leak khi Fragment bị hủy
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }

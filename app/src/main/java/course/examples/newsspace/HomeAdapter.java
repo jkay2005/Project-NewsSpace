@@ -35,9 +35,22 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_FOOTER = 6;
 
     private final List<Object> items;
+    private final Map<String, String> categoryMap;
+    private boolean isCategoryChipsPopulated = false;
 
     public HomeAdapter(List<Object> items) {
         this.items = items;
+        this.categoryMap = new LinkedHashMap<>();
+        // Sửa lỗi: Loại bỏ "Chính trị" vì không có endpoint riêng
+        categoryMap.put("Mới nhất", "Mới nhất");
+        categoryMap.put("Thời sự", "Thời sự");
+        categoryMap.put("Thế giới", "Thế giới");
+        categoryMap.put("Kinh tế", "Kinh tế");
+        categoryMap.put("Giải trí", "Giải trí");
+        categoryMap.put("Thể thao", "Thể thao");
+        categoryMap.put("Sức khỏe", "Sức khỏe");
+        categoryMap.put("Công nghệ", "Công nghệ");
+        categoryMap.put("Khoa học", "Khoa học");
     }
 
     @Override
@@ -79,7 +92,10 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         Object currentItem = items.get(position);
         switch (holder.getItemViewType()) {
             case TYPE_TABS:
-                populateCategoryChips((TabsViewHolder) holder);
+                if (!isCategoryChipsPopulated) {
+                    populateCategoryChips((TabsViewHolder) holder);
+                    isCategoryChipsPopulated = true;
+                }
                 break;
             case TYPE_SECTION_HEADER:
                 SectionHeader sectionHeader = (SectionHeader) currentItem;
@@ -100,19 +116,6 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     private void populateCategoryChips(TabsViewHolder holder) {
-        // Tạo bản đồ đối chiếu trực tiếp trong phương thức
-        Map<String, String> categoryMap = new LinkedHashMap<>();
-        categoryMap.put("Mới nhất", "breaking-news");
-        categoryMap.put("Thời sự", "nation");
-        categoryMap.put("Chính trị", "nation");
-        categoryMap.put("Thế giới", "world");
-        categoryMap.put("Kinh tế", "business");
-        categoryMap.put("Giải trí", "entertainment");
-        categoryMap.put("Thể thao", "sports");
-        categoryMap.put("Sức khỏe", "health");
-        categoryMap.put("Công nghệ", "technology");
-        categoryMap.put("Khoa học", "science");
-
         holder.binding.categoryChipGroup.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(holder.itemView.getContext());
 
@@ -121,7 +124,7 @@ public class HomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             chip.setText(displayName);
 
             chip.setOnClickListener(v -> {
-                // Lấy khóa API từ bản đồ
+                // Lấy khóa API từ bản đồ (bây giờ đã chính xác)
                 String apiKey = categoryMap.get(displayName);
 
                 // Tạo action và truyền khóa API đi

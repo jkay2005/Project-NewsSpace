@@ -1,9 +1,42 @@
 package course.examples.newsspace.utils;
 
 import java.text.Normalizer;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class TopicHelper {
+
+    private static final Map<String, String> categoryToApiKeyMap;
+
+    static {
+        categoryToApiKeyMap = new LinkedHashMap<>();
+        categoryToApiKeyMap.put("Mới nhất", "breaking-news");
+        categoryToApiKeyMap.put("Thời sự", "nation");
+        categoryToApiKeyMap.put("Chính trị", "nation");
+        categoryToApiKeyMap.put("Thế giới", "world");
+        categoryToApiKeyMap.put("Kinh tế", "business");
+        categoryToApiKeyMap.put("Giải trí", "entertainment");
+        categoryToApiKeyMap.put("Thể thao", "sports");
+        categoryToApiKeyMap.put("Sức khỏe", "health");
+        categoryToApiKeyMap.put("Công nghệ", "technology");
+        categoryToApiKeyMap.put("Khoa học", "science");
+        // Bổ sung các danh mục khác nếu cần
+    }
+
+    /**
+     * Lấy khóa API cho một tên danh mục cụ thể.
+     * @param categoryName Tên hiển thị của danh mục (ví dụ: "Thời sự").
+     * @return Khóa API tương ứng (ví dụ: "nation").
+     */
+    public static String getApiTopicKey(String categoryName) {
+        if (categoryName == null || !categoryToApiKeyMap.containsKey(categoryName)) {
+            // Trả về slug được tạo tự động như một phương án dự phòng
+            // hoặc xử lý lỗi một cách phù hợp.
+            return toSlug(categoryName);
+        }
+        return categoryToApiKeyMap.get(categoryName);
+    }
 
     /**
      * Chuyển đổi một chuỗi tiếng Việt có dấu thành dạng "slug" không dấu,
