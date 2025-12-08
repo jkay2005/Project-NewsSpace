@@ -34,5 +34,8 @@
     <color name="divider_color">#E0E0E0</color>
 
     <color name="unread_notification_bg">#F5F5F5</color>.
+    <!--Màu cho icon khi bookmark trống -->
+
+    <color name="grey_400">#BDBDBD</color>
 
 </resources>

@@ -1,10 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/bookmarkRecyclerView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipToPadding="false"
-    android:paddingBottom="80dp"
-    tools:context=".BookmarkFragment"
-    tools:listitem="@layout/item_standard_news_card" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".BookmarkFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bookmarkRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        tools:listitem="@layout/item_standard_news_card" />
+
+    <!-- Giao diện hiển thị khi danh sách trống -->
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_nav_bookmark"
+            app:tint="@color/grey_400" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Chưa có bài viết nào được lưu"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Nhấn vào biểu tượng bookmark để lưu lại sau."
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            android:textColor="@color/text_secondary"/>
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,16 +1,20 @@
 package course.examples.newsspace.model;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 
 /**
  * Lớp Model đa năng, đại diện cho một bài báo.
- * Chứa các trường được ánh xạ từ JSON response của API và các trường/phương thức
- * bổ sung để hỗ trợ hiển thị trên giao diện.
+ * Giờ đây cũng là một Room Entity để lưu trữ các bài báo đã đánh dấu.
  */
+@Entity(tableName = "bookmarked_articles") // Đánh dấu lớp này là một bảng trong cơ sở dữ liệu
 public class Article {
 
-    // --- CÁC TRƯỜNG DỮ LIỆU ÁNH XẠ TỪ API ---
+    // --- CÁC TRƯỜNG DỮ LIỆU SẼ ĐƯỢC LƯU TRONG CSDL ---
 
+    @PrimaryKey // Đánh dấu 'id' là khóa chính
     @SerializedName("id")
     private int id;
 
@@ -23,24 +27,34 @@ public class Article {
     @SerializedName("authorId")
     private int authorId;
 
-    @SerializedName("author")
-    private Author author;
-
     @SerializedName("createdAt")
     private String createdAt;
 
     // --- CÁC TRƯỜNG BỔ SUNG CHO GIAO DIỆN (KHÔNG CÓ TRONG JSON) ---
+    // Room cũng sẽ lưu các trường này
 
     private boolean isFeatured;
     private String imageUrl;
     private String date; // Trường date đã được xử lý
     private String description; // Trường description đã được xử lý
+    private boolean isBookmarked; // Trường mới để theo dõi trạng thái bookmark
 
-    // --- CONSTRUCTORS (Dùng để tạo đối tượng từ code, không phải từ Gson) ---
+    // --- CÁC TRƯỜNG PHỨC TẠP SẼ BỊ BỎ QUA (KHÔNG LƯU VÀO CSDL) ---
 
-    // Constructor rỗng - Bắt buộc phải có để Gson hoạt động chính xác
+    @Ignore // Yêu cầu Room bỏ qua trường này
+    @SerializedName("author")
+    private Author author;
+
+    @Ignore // Yêu cầu Room bỏ qua trường này
+    @SerializedName("category")
+    private Category category;
+
+    // --- CONSTRUCTORS ---
+
+    // Constructor rỗng - Bắt buộc cho cả Gson và Room
     public Article() {}
 
+    // Các factory method tĩnh vẫn hoạt động bình thường
     public static Article createFeaturedArticle(int id, String title, String description, String imageUrl) {
         Article article = new Article();
         article.id = id;
@@ -61,74 +75,55 @@ public class Article {
         return article;
     }
 
-    // --- GETTERS (PHẦN QUAN TRỌNG NHẤT ĐỂ SỬA LỖI) ---
+    // --- GETTERS AND SETTERS ---
+    // Room cần các getters và setters để truy cập các trường
 
-    public int getId() {
-        return id;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public String getTitle() {
-        return title;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getContent() {
-        return content;
-    }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
-    public int getAuthorId() {
-        return authorId;
-    }
+    public int getAuthorId() { return authorId; }
+    public void setAuthorId(int authorId) { this.authorId = authorId; }
 
-    public Author getAuthor() {
-        return author;
-    }
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    // --- CÁC GETTERS TÙY CHỈNH CHO GIAO DIỆN ---
-
-    public boolean isFeatured() {
-        return isFeatured;
-    }
+    public boolean isFeatured() { return isFeatured; }
+    public void setFeatured(boolean featured) { isFeatured = featured; }
 
     public String getImageUrl() {
-        // Ưu tiên URL đã được gán sẵn
-        if (imageUrl != null && !imageUrl.isEmpty()) {
-            return imageUrl;
-        }
+        if (imageUrl != null && !imageUrl.isEmpty()) { return imageUrl; }
         // TODO: Thêm logic trích xuất ảnh từ 'content' nếu cần
-        return "https://picsum.photos/400/200"; // Trả về ảnh mẫu nếu không có
+        return "https://picsum.photos/400/200";
     }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public String getDate() {
-        // Ưu tiên ngày đã được gán sẵn
-        if (date != null && !date.isEmpty()) {
-            return date;
-        }
-        // Nếu không, lấy từ 'createdAt' và định dạng lại
-        if (createdAt != null && createdAt.length() >= 10) {
-            return createdAt.substring(0, 10); // Lấy phần YYYY-MM-DD
-        }
-        return ""; // Trả về rỗng nếu không có
+        if (date != null && !date.isEmpty()) { return date; }
+        if (createdAt != null && createdAt.length() >= 10) { return createdAt.substring(0, 10); }
+        return "";
     }
+    public void setDate(String date) { this.date = date; }
 
     public String getDescription() {
-        // Ưu tiên mô tả đã được gán sẵn
-        if (description != null && !description.isEmpty()) {
-            return description;
-        }
-        // Nếu không, có thể lấy một đoạn ngắn từ 'content'
-        if (content != null && content.length() > 150) {
-            return content.substring(0, 150) + "...";
-        }
+        if (description != null && !description.isEmpty()) { return description; }
+        if (content != null && content.length() > 150) { return content.substring(0, 150) + "..."; }
         return content != null ? content : "";
     }
+    public void setDescription(String description) { this.description = description; }
 
-    // (Tùy chọn) Thêm Getter cho Category, nếu API trả về
-    // Ví dụ, nếu API trả về một đối tượng Category
-     @SerializedName("category")
-    private Category category;
+    public boolean isBookmarked() { return isBookmarked; }
+    public void setBookmarked(boolean bookmarked) { isBookmarked = bookmarked; }
+
+    // --- Getters and Setters cho các trường bị @Ignore ---
+    public Author getAuthor() { return author; }
+    public void setAuthor(Author author) { this.author = author; }
+
     public Category getCategory() { return category; }
+    public void setCategory(Category category) { this.category = category; }
 }
