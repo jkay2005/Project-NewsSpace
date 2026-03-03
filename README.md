@@ -2,7 +2,7 @@
 
 > Splash Art và Đăng nhập
 
-![preview](images/Blog.png)
+![preview](images/UserController.png)
 
 > Đăng kí
 
